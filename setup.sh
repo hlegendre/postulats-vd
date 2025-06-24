@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Script de configuration du Téléchargeur de postulats VD
+# Script de configuration du Téléchargeur de séances du Conseil d'État VD
 # Ce script aide à configurer le projet avec uv
 
 set -e
 
-echo "Téléchargeur de postulats VD - Script de configuration"
-echo "======================================================"
+echo "Téléchargeur de séances du Conseil d'État VD - Script de configuration"
+echo "======================================================================"
 
 # Check if Python is installed
 if ! command -v python3 &> /dev/null; then

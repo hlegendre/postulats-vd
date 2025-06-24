@@ -1,7 +1,7 @@
 [project]
 name = "telechargeur-postulats-vd"
 version = "1.0.0"
-description = "Application Python qui télécharge automatiquement les postulats du Grand Conseil vaudois"
+description = "Application Python qui télécharge automatiquement les postulats du Conseil d'Etat du Canton de Vaud"
 authors = [{ name = "Hugues Le Gendre", email = "hugues@ikivox.org" }]
 readme = "README.md"
 requires-python = ">=3.8.1"

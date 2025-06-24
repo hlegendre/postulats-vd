@@ -1,141 +1,142 @@
 #!/usr/bin/env python3
 """
-Script de test pour le Téléchargeur de postulats VD
-Teste l'accessibilité du site web et l'extraction des liens PDF.
+Tests pour le Téléchargeur de Séances du Conseil d'État VD
+
+Ce module contient les tests unitaires pour vérifier le bon fonctionnement
+du téléchargeur de séances.
 """
 
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
-from config import *
-from downloader import TelechargeurPostulatsVD
+import json
+import tempfile
+from pathlib import Path
+from datetime import datetime
+from downloader import TelechargeurSeancesVD
 
+# Import de la configuration
+try:
+    from config import OUTPUT_FOLDER
+except ImportError:
+    print("❌ Erreur: Impossible d'importer le fichier de configuration 'config.py'")
+    print("   Assurez-vous que le fichier config.py existe dans le répertoire courant.")
+    exit(1)
 
-def test_website_accessibility():
-    """Teste l'accessibilité du site web cible."""
-    print("🔍 Test d'accessibilité du site web...")
+def test_single_file_logging():
+    """Test du nouveau système de logging avec un seul fichier JSON."""
     
-    try:
-        session = requests.Session()
-        session.headers.update({'User-Agent': USER_AGENT})
+    # Créer un dossier temporaire pour les tests
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
         
-        response = session.get(TARGET_URL, timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
+        print("=== Test du système de logging avec un seul fichier JSON ===")
+        print(f"Dossier temporaire : {temp_path}")
+        print()
         
-        print(f"✅ Site web accessible (Status: {response.status_code})")
-        return response.text
-    except requests.RequestException as e:
-        print(f"❌ Erreur d'accès au site web : {e}")
-        return None
-
-
-def test_pdf_link_extraction(html_content):
-    """Teste l'extraction des liens PDF."""
-    print("🔍 Test d'extraction des liens PDF...")
-    
-    if not html_content:
-        print("❌ Pas de contenu HTML à analyser")
-        return []
-    
-    try:
-        soup = BeautifulSoup(html_content, 'html.parser')
-        base_url = f"{urlparse(TARGET_URL).scheme}://{urlparse(TARGET_URL).netloc}"
+        # Premier lancement - devrait créer le fichier et ajouter toutes les séances
+        print("1. Premier lancement...")
+        downloader1 = TelechargeurSeancesVD(output_folder=str(temp_path))
+        result1 = downloader1.scrape_seances()
         
-        # Find all links
-        links = soup.find_all('a', href=True)
-        pdf_links = []
-        
-        for link in links:
-            href = link.get('href')
-            if href:
-                # Check if the link contains any of the search keywords
-                href_upper = href.upper()
-                if any(keyword.upper() in href_upper for keyword in SEARCH_KEYWORDS):
-                    # Check if it's a PDF or has a PDF-like structure
-                    if any(ext.lower() in href.lower() for ext in FILE_EXTENSIONS) or 'pdf' in href.lower():
-                        full_url = urljoin(base_url, href)
-                        pdf_links.append(full_url)
-        
-        print(f"✅ {len(pdf_links)} liens PDF trouvés contenant les mots-clés {SEARCH_KEYWORDS}")
-        
-        if pdf_links:
-            print("📋 Liens trouvés :")
-            for i, link in enumerate(pdf_links[:5], 1):  # Show first 5 links
-                print(f"   {i}. {link}")
-            if len(pdf_links) > 5:
-                print(f"   ... et {len(pdf_links) - 5} autres")
-        
-        return pdf_links
-    except Exception as e:
-        print(f"❌ Erreur lors de l'extraction des liens : {e}")
-        return []
-
-
-def test_pdf_urls_accessibility(pdf_links):
-    """Teste l'accessibilité des URLs PDF trouvées."""
-    print("🔍 Test d'accessibilité des URLs PDF...")
-    
-    if not pdf_links:
-        print("❌ Aucun lien PDF à tester")
-        return
-    
-    session = requests.Session()
-    session.headers.update({'User-Agent': USER_AGENT})
-    
-    accessible_count = 0
-    total_count = min(len(pdf_links), 3)  # Test only first 3 URLs
-    
-    for i, pdf_url in enumerate(pdf_links[:3], 1):
-        try:
-            print(f"   Test {i}/{total_count} : {pdf_url}")
-            response = session.head(pdf_url, timeout=REQUEST_TIMEOUT)
+        if result1['success']:
+            print(f"   ✅ Succès : {result1['total_count']} séances totales, {result1['new_count']} nouvelles")
             
-            if response.status_code == 200:
-                content_type = response.headers.get('content-type', '').lower()
-                if 'pdf' in content_type or pdf_url.lower().endswith('.pdf'):
-                    print(f"   ✅ Accessible (Content-Type: {content_type})")
-                    accessible_count += 1
-                else:
-                    print(f"   ⚠️  Accessible mais pas un PDF (Content-Type: {content_type})")
-            else:
-                print(f"   ❌ Non accessible (Status: {response.status_code})")
+            # Vérifier que le fichier existe
+            seances_file = temp_path / "seances_conseil_etat.json"
+            if seances_file.exists():
+                print(f"   📁 Fichier créé : {seances_file}")
                 
-        except requests.RequestException as e:
-            print(f"   ❌ Erreur d'accès : {e}")
-    
-    print(f"📊 Résumé : {accessible_count}/{total_count} URLs PDF accessibles")
-
-
-def main():
-    """Fonction principale du script de test."""
-    print("🧪 Test du Téléchargeur de postulats VD")
-    print("=" * 50)
-    print(f"URL cible : {TARGET_URL}")
-    print(f"Mots-clés de recherche : {SEARCH_KEYWORDS}")
-    print(f"Extensions de fichiers : {FILE_EXTENSIONS}")
-    print()
-    
-    # Test 1: Website accessibility
-    html_content = test_website_accessibility()
-    print()
-    
-    # Test 2: PDF link extraction
-    pdf_links = test_pdf_link_extraction(html_content)
-    print()
-    
-    # Test 3: PDF URLs accessibility
-    test_pdf_urls_accessibility(pdf_links)
-    print()
-    
-    # Summary
-    print("=" * 50)
-    if html_content and pdf_links:
-        print("🎉 Tous les tests sont passés ! L'application devrait fonctionner correctement.")
-        print("💡 Vous pouvez maintenant lancer : python downloader.py")
-    else:
-        print("⚠️  Certains tests ont échoué. Vérifiez votre connexion internet et l'URL cible.")
-        print("💡 Consultez les messages d'erreur ci-dessus pour plus de détails.")
+                # Vérifier le contenu
+                with open(seances_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    seances = data.get('seances', [])
+                    print(f"   📊 {len(seances)} séances dans le fichier")
+                    
+                    # Vérifier que toutes les séances ont une date de découverte
+                    seances_with_discovery = [s for s in seances if 'date_decouverte' in s]
+                    print(f"   🕒 {len(seances_with_discovery)} séances avec date de découverte")
+                    
+                    if seances:
+                        first_seance = seances[0]
+                        print(f"   📅 Première séance : {first_seance['date']} - {first_seance['titre']}")
+                        if 'date_decouverte' in first_seance:
+                            print(f"   🔍 Découverte le : {first_seance['date_decouverte']}")
+        else:
+            print(f"   ❌ Échec : {result1.get('error', 'Erreur inconnue')}")
+            return False
+        
+        print()
+        
+        # Deuxième lancement - devrait ignorer les séances existantes
+        print("2. Deuxième lancement (même données)...")
+        downloader2 = TelechargeurSeancesVD(output_folder=str(temp_path))
+        result2 = downloader2.scrape_seances()
+        
+        if result2['success']:
+            print(f"   ✅ Succès : {result2['total_count']} séances totales, {result2['new_count']} nouvelles")
+            
+            if result2['new_count'] == 0:
+                print("   ✅ Aucune nouvelle séance ajoutée (comportement attendu)")
+            else:
+                print(f"   ⚠️  {result2['new_count']} nouvelles séances ajoutées (inattendu)")
+        else:
+            print(f"   ❌ Échec : {result2.get('error', 'Erreur inconnue')}")
+            return False
+        
+        print()
+        
+        # Test avec ajout manuel d'une nouvelle séance
+        print("3. Test avec ajout manuel d'une nouvelle séance...")
+        
+        # Lire le fichier existant
+        with open(seances_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            seances = data.get('seances', [])
+        
+        # Ajouter une nouvelle séance manuellement
+        new_seance = {
+            "url": "https://www.vd.ch/test/nouvelle-seance",
+            "date": "2025-06-25",
+            "date_originale": "25 juin 2025",
+            "titre": "Séance du Conseil d'Etat du 25 juin 2025",
+            "date_decouverte": datetime.now().isoformat()
+        }
+        seances.append(new_seance)
+        
+        # Sauvegarder le fichier modifié
+        data['seances'] = seances
+        data['metadonnees']['total_seances'] = len(seances)
+        data['metadonnees']['derniere_mise_a_jour'] = datetime.now().isoformat()
+        
+        with open(seances_file, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        
+        print(f"   📝 Nouvelle séance ajoutée manuellement")
+        
+        # Troisième lancement - devrait détecter la nouvelle séance
+        print("4. Troisième lancement (après ajout manuel)...")
+        downloader3 = TelechargeurSeancesVD(output_folder=str(temp_path))
+        result3 = downloader3.scrape_seances()
+        
+        if result3['success']:
+            print(f"   ✅ Succès : {result3['total_count']} séances totales, {result3['new_count']} nouvelles")
+            
+            # Vérifier que le nombre total est correct
+            expected_total = result1['total_count'] + 1  # +1 pour la séance ajoutée manuellement
+            if result3['total_count'] == expected_total:
+                print(f"   ✅ Nombre total correct : {result3['total_count']}")
+            else:
+                print(f"   ⚠️  Nombre total incorrect : attendu {expected_total}, obtenu {result3['total_count']}")
+        else:
+            print(f"   ❌ Échec : {result3.get('error', 'Erreur inconnue')}")
+            return False
+        
+        print()
+        print("=== Test terminé avec succès ===")
+        return True
 
 
 if __name__ == "__main__":
-    main() 
+    success = test_single_file_logging()
+    if success:
+        print("🎉 Tous les tests ont réussi !")
+    else:
+        print("❌ Certains tests ont échoué.") 

@@ -1,9 +1,9 @@
 @echo off
-REM Script de configuration du Téléchargeur de postulats VD pour Windows
+REM Script de configuration du Téléchargeur de séances du Conseil d'État VD pour Windows
 REM Ce script aide à configurer le projet avec uv
 
-echo Téléchargeur de postulats VD - Script de configuration
-echo ======================================================
+echo Téléchargeur de séances du Conseil d'État VD - Script de configuration
+echo =====================================================================
 
 REM Check if Python is installed
 python --version >nul 2>&1
