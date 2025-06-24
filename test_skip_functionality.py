@@ -6,7 +6,7 @@ Test script pour vérifier la fonctionnalité de saut de fichiers existants
 import os
 import tempfile
 from pathlib import Path
-from vaud_pdf_downloader import TelechargeurPostulatsVD
+from downloader import TelechargeurPostulatsVD
 from config import SKIP_EXISTING_FILES
 
 def test_skip_functionality():

@@ -55,7 +55,7 @@ class TelechargeurPostulatsVD:
         
     def setup_logging(self):
         """Configuration de la journalisation."""
-        self.logger = logging.getLogger('TelechargeurPostulatsVD')
+        self.logger = logging.getLogger('Downloader')
         self.logger.setLevel(logging.INFO)
         
         # Create formatter

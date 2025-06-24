@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from config import *
+from downloader import TelechargeurPostulatsVD
 
 
 def test_website_accessibility():
@@ -130,7 +131,7 @@ def main():
     print("=" * 50)
     if html_content and pdf_links:
         print("🎉 Tous les tests sont passés ! L'application devrait fonctionner correctement.")
-        print("💡 Vous pouvez maintenant lancer : python vaud_pdf_downloader.py")
+        print("💡 Vous pouvez maintenant lancer : python downloader.py")
     else:
         print("⚠️  Certains tests ont échoué. Vérifiez votre connexion internet et l'URL cible.")
         print("💡 Consultez les messages d'erreur ci-dessus pour plus de détails.")

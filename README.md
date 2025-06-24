@@ -51,7 +51,7 @@ Assurez-vous d'avoir Python 3.8+ installé sur votre système.
 Lancer l'application principale :
 
 ```bash
-python vaud_pdf_downloader.py
+python downloader.py
 ```
 
 Cela va :
@@ -102,7 +102,7 @@ SKIP_EXISTING_FILES = True  # Ignorer les fichiers déjà présents dans le doss
 Vous pouvez aussi utiliser le téléchargeur programmatiquement :
 
 ```python
-from vaud_pdf_downloader import TelechargeurPostulatsVD
+from downloader import TelechargeurPostulatsVD
 
 # Initialiser avec des paramètres personnalisés
 telechargeur = TelechargeurPostulatsVD(
@@ -121,7 +121,7 @@ print(f"{telechargements_reussis} fichiers PDF téléchargés")
 
 ```text
 telechargeur_postulats_vd/
-├── vaud_pdf_downloader.py       # Application principale
+├── downloader.py              # Application principale
 ├── config.py                    # Fichier de configuration
 ├── test_downloader.py           # Script de test
 ├── pyproject.toml               # Configuration du projet (uv)
