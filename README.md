@@ -58,7 +58,7 @@ Cela va :
 
 - Extraire la page des rapports de commission du Grand Conseil vaudois
 - Trouver tous les liens PDF contenant "POS" dans le nom de fichier
-- Les télécharger dans le dossier `pos_pdfs`
+- Les télécharger dans le dossier `postulats`
 - Afficher le progrès et les résultats
 
 ### Test
@@ -85,7 +85,7 @@ SEARCH_KEYWORDS = ["POS"]  # Mots-clés à rechercher dans les noms de fichiers
 FILE_EXTENSIONS = [".pdf"]  # Extensions de fichiers à télécharger
 
 # Paramètres de sortie
-OUTPUT_FOLDER = "pos_pdfs"  # Dossier pour sauvegarder les PDFs téléchargés
+OUTPUT_FOLDER = "postulats"  # Dossier pour sauvegarder les PDFs téléchargés
 
 # Paramètres de téléchargement
 DOWNLOAD_TIMEOUT = 60  # secondes
@@ -129,7 +129,7 @@ telechargeur_postulats_vd/
 ├── setup.sh                     # Script de configuration (macOS/Linux)
 ├── setup.bat                    # Script de configuration (Windows)
 ├── .venv/                       # Environnement virtuel (créé par uv)
-└── pos_pdfs/                    # PDFs téléchargés (créé automatiquement)
+└── postulats/                    # PDFs téléchargés (créé automatiquement)
 ```
 
 ## Développement
@@ -205,12 +205,12 @@ L'application détecte automatiquement l'URL de base à partir de l'URL cible fo
 Téléchargeur de postulats VD
 ==================================================
 URL cible : https://www.vd.ch/gc/objets-et-rapports-de-commissions/liste-des-rapports-de-commission
-Dossier de sortie : pos_pdfs
+Dossier de sortie : postulats
 Mots-clés de recherche : ['POS']
 Extensions de fichiers : ['.pdf']
 Ignorer les fichiers existants : Oui
 
-2024-01-15 10:30:15 - INFO - Téléchargeur de postulats initialisé avec le dossier de sortie : pos_pdfs
+2024-01-15 10:30:15 - INFO - Téléchargeur de postulats initialisé avec le dossier de sortie : postulats
 2024-01-15 10:30:15 - INFO - Début de l'extraction et du téléchargement depuis : https://www.vd.ch/...
 2024-01-15 10:30:16 - INFO - Récupération de la page : https://www.vd.ch/...
 2024-01-15 10:30:17 - INFO - Page récupérée avec succès
@@ -228,8 +228,8 @@ Ignorer les fichiers existants : Oui
 ==================================================
 Téléchargement terminé !
 3 fichiers PDF téléchargés avec succès
-Les fichiers déjà présents dans 'pos_pdfs' ont été ignorés
-Fichiers enregistrés dans : pos_pdfs
+Les fichiers déjà présents dans 'postulats' ont été ignorés
+Fichiers enregistrés dans : postulats
 Durée : 0:00:10.234567
 ```
 

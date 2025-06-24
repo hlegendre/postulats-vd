@@ -4,7 +4,7 @@ Fichier de configuration pour le "Téléchargeur de postulats VD"
 
 # Base configuration
 TARGET_URL = "https://www.vd.ch/gc/objets-et-rapports-de-commissions/liste-des-rapports-de-commission"
-OUTPUT_FOLDER = "pos_pdfs"
+OUTPUT_FOLDER = "postulats"
 
 # Search criteria
 SEARCH_KEYWORDS = ["POS"]  # Keywords to look for in filenames
