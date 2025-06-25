@@ -62,8 +62,25 @@ pip install -e .
 ### Exécution
 
 ```bash
+# Mode silencieux (par défaut)
 python run.py
+
+# Mode info (affiche les informations de base)
+python run.py -v
+
+# Mode debug (affiche tous les détails)
+python run.py -vv
+
+# Afficher l'aide
+python run.py --help
 ```
+
+### Options disponibles
+
+- `-v, --verbose` : Niveau de verbosité
+  - `-v` : Mode info (affiche les informations de base)
+  - `-vv` : Mode debug (affiche tous les détails)
+  - Par défaut : Mode silencieux
 
 ### Sortie
 
@@ -200,12 +217,12 @@ Les tests vérifient :
 
 ## Configuration
 
-Le script utilise le fichier `config.py` pour la configuration :
+Le script utilise le fichier `config.py` pour sa configuration :
 
-- `TARGET_URL` : URL de la page des décisions du Conseil d'État
 - `OUTPUT_FOLDER` : Dossier de sortie pour les fichiers JSON
-- `USER_AGENT` : User-Agent pour les requêtes HTTP
-- `REQUEST_TIMEOUT` : Timeout des requêtes HTTP
-- `MAX_PAGES` : Nombre maximum de pages à parcourir
-- `PAGE_DELAY` : Délai entre les requêtes de pages
+- `MAX_SESSIONS` : Nombre maximum de pages à parcourir
 - `STOP_DATE` : Date limite d'arrêt (format YYYY-MM-DD)
+- `REQUEST_TIMEOUT` : Timeout des requêtes HTTP
+- `PAGE_DELAY` : Délai entre les requêtes de pages
+
+**Note** : Le niveau de verbosité est maintenant configuré via les arguments de ligne de commande (`-v`, `-vv`) et non plus dans le fichier de configuration.

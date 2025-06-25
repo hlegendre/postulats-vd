@@ -5,7 +5,6 @@ Fichier de configuration pour le "Téléchargeur de séances du Conseil d'État 
 # Configuration de base
 OUTPUT_FOLDER = "output"
 MAX_SESSIONS = 1000  # Nombre maximum de sessions du CE à parcourir (sécurité)
-VERBOSE = False
 
 # Date limite d'arrêt (format: 'YYYY-MM-DD')
 # Le script s'arrêtera quand il trouvera une séance antérieure à cette date
