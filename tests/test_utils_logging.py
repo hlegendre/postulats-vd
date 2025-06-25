@@ -5,7 +5,7 @@ Test de la classe LoggingUtils
 Ce script teste les fonctionnalités de la classe utilitaire de logging.
 """
 
-from .logging_utils import LoggingUtils
+from postulats_vd.utils.logging import LoggingUtils
 
 
 def test_logging_utils():

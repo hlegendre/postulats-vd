@@ -1,12 +1,12 @@
 import argparse
 import logging
-from config import (
+from postulats_vd.config import (
     MAX_SESSIONS,
     OUTPUT_FOLDER,
     PAGE_DELAY,
     STOP_DATE,
 )
-from src.downloader import TelechargeurSeancesVD
+from postulats_vd.core.downloader import TelechargeurSeancesVD
 
 
 def parse_arguments():

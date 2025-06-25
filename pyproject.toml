@@ -1,5 +1,5 @@
 [project]
-name = "postulats-dl"
+name = "postulats-vd"
 version = "1.0.0"
 description = "Application Python qui télécharge automatiquement les postulats du Conseil d'Etat du Canton de Vaud"
 authors = [{ name = "Hugues Le Gendre", email = "hugues@ikivox.org" }]
@@ -15,10 +15,21 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=7.0.0", "black>=23.0.0", "flake8>=6.0.0"]
 
+[project.scripts]
+postulats-vd = "scripts.run:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/postulats_vd"]
+
 [tool.black]
 line-length = 120
 target-version = ['py38']
 
 [tool.pytest.ini_options]
-testpaths = ["."]
+testpaths = ["tests"]
 python_files = ["test_*.py"]
+pythonpath = ["src"]

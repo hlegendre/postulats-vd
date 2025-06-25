@@ -3,7 +3,6 @@
 Gestionnaire de stockage des données du projet
 
 Cette classe gère la persistance des données dans un fichier JSON.
-Implémentation en singleton pour garantir une instance unique.
 Initialement conçu pour les séances du Conseil d'État VD, mais extensible.
 
 Auteur: Hugues Le Gendre
@@ -14,12 +13,12 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from .logging_utils import LoggingUtils
+from ..utils.logging import LoggingUtils
 
 
 class Storage:
     """
-    Singleton pour gérer le stockage des données du projet.
+    Gestionnaire de stockage des données du projet.
 
     Cette classe fournit une interface claire pour :
     - Vérifier si une séance existe
@@ -27,15 +26,6 @@ class Storage:
 
     La classe sauvegarde automatiquement les données dans un fichier JSON.
     """
-
-    _instance = None
-    _initialized = False
-
-    def __new__(cls, *args, **kwargs):
-        """Implémentation du pattern singleton."""
-        if cls._instance is None:
-            cls._instance = super(Storage, cls).__new__(cls)
-        return cls._instance
 
     def __init__(self, output_folder: str = "output", filename: str = "storage.json"):
         """
@@ -45,9 +35,6 @@ class Storage:
             output_folder (str): Dossier de sortie pour les fichiers
             filename (str): Nom du fichier JSON
         """
-        if self._initialized:
-            return
-
         self.output_folder = Path(output_folder)
         self.filename = filename
         self.storage_file = self.output_folder / filename
@@ -56,12 +43,11 @@ class Storage:
         self.logger = LoggingUtils.setup_simple_logger("Storage")
 
         # Créer le dossier de sortie s'il n'existe pas
-        self.output_folder.mkdir(exist_ok=True)
+        self.output_folder.mkdir(parents=True, exist_ok=True)
 
         # Charger les séances existantes
         self._seances_cache = self._load_existing_seances()
 
-        self._initialized = True
         self.logger.debug(f"Storage initialisé avec le fichier : {self.storage_file}")
         self.logger.debug(f"Séances existantes chargées : {len(self._seances_cache)}")
 

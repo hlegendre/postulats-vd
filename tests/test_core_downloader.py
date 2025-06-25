@@ -10,7 +10,7 @@ import json
 import tempfile
 from pathlib import Path
 from datetime import datetime
-from .downloader import TelechargeurSeancesVD
+from postulats_vd.core.downloader import TelechargeurSeancesVD
 
 
 def test_single_file_logging():
@@ -29,32 +29,29 @@ def test_single_file_logging():
         downloader1 = TelechargeurSeancesVD(output_folder=str(temp_path))
         result1 = downloader1.scrape_seances()
 
-        if result1["success"]:
-            print(f"   ✅ Succès : {result1['total_count']} séances totales, {result1['new_count']} nouvelles")
+        assert result1["success"], f"Échec du premier lancement : {result1.get('error', 'Erreur inconnue')}"
+        print(f"   ✅ Succès : {result1['stored_seances']} séances totales, {result1['new_seances_count']} nouvelles")
 
-            # Vérifier que le fichier existe
-            seances_file = temp_path / "seances_conseil_etat.json"
-            if seances_file.exists():
-                print(f"   📁 Fichier créé : {seances_file}")
+        # Vérifier que le fichier existe
+        seances_file = temp_path / "storage.json"
+        assert seances_file.exists(), "Le fichier storage.json n'a pas été créé"
+        print(f"   📁 Fichier créé : {seances_file}")
 
-                # Vérifier le contenu
-                with open(seances_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    seances = data.get("seances", [])
-                    print(f"   📊 {len(seances)} séances dans le fichier")
+        # Vérifier le contenu
+        with open(seances_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            assert "seances" in data, "Le fichier storage.json doit contenir une clé 'seances'"
+            seances = data.get("seances", [])
+            assert isinstance(seances, list), "La valeur de 'seances' doit être une liste"
+            assert len(seances) > 0, "Aucune séance trouvée dans le fichier"
+            print(f"   📊 {len(seances)} séances dans le fichier")
 
-                    # Vérifier que toutes les séances ont une date de découverte
-                    seances_with_discovery = [s for s in seances if "date_decouverte" in s]
-                    print(f"   🕒 {len(seances_with_discovery)} séances avec date de découverte")
-
-                    if seances:
-                        first_seance = seances[0]
-                        print(f"   📅 Première séance : {first_seance['date']} - {first_seance['titre']}")
-                        if "date_decouverte" in first_seance:
-                            print(f"   🔍 Découverte le : {first_seance['date_decouverte']}")
-        else:
-            print(f"   ❌ Échec : {result1.get('error', 'Erreur inconnue')}")
-            return False
+            # Vérifier que toutes les séances ont une date de découverte
+            seances_with_discovery = [s for s in seances if "date_decouverte" in s]
+            assert len(seances_with_discovery) == len(
+                seances
+            ), "Toutes les séances doivent avoir une date de découverte"
+            print(f"   🕒 {len(seances_with_discovery)} séances avec date de découverte")
 
         print()
 
@@ -63,16 +60,10 @@ def test_single_file_logging():
         downloader2 = TelechargeurSeancesVD(output_folder=str(temp_path))
         result2 = downloader2.scrape_seances()
 
-        if result2["success"]:
-            print(f"   ✅ Succès : {result2['total_count']} séances totales, {result2['new_count']} nouvelles")
-
-            if result2["new_count"] == 0:
-                print("   ✅ Aucune nouvelle séance ajoutée (comportement attendu)")
-            else:
-                print(f"   ⚠️  {result2['new_count']} nouvelles séances ajoutées (inattendu)")
-        else:
-            print(f"   ❌ Échec : {result2.get('error', 'Erreur inconnue')}")
-            return False
+        assert result2["success"], f"Échec du deuxième lancement : {result2.get('error', 'Erreur inconnue')}"
+        assert result2["stored_seances"] == result1["stored_seances"], "Le nombre de séances stockées doit être le même"
+        assert result2["new_seances_count"] == 0, "Aucune nouvelle séance doit être ajoutée"
+        print(f"   ✅ Succès : {result2['stored_seances']} séances totales, {result2['new_seances_count']} nouvelles")
 
         print()
 
@@ -82,7 +73,10 @@ def test_single_file_logging():
         # Lire le fichier existant
         with open(seances_file, "r", encoding="utf-8") as f:
             data = json.load(f)
+            assert "seances" in data, "Le fichier storage.json doit contenir une clé 'seances'"
             seances = data.get("seances", [])
+            assert isinstance(seances, list), "La valeur de 'seances' doit être une liste"
+            assert len(seances) > 0, "Aucune séance trouvée dans le fichier"
 
         # Ajouter une nouvelle séance manuellement
         new_seance = {
@@ -96,7 +90,7 @@ def test_single_file_logging():
 
         # Sauvegarder le fichier modifié
         data["seances"] = seances
-        data["metadonnees"]["total_seances"] = len(seances)
+        data["metadonnees"]["stored_seances"] = len(seances)
         data["metadonnees"]["derniere_mise_a_jour"] = datetime.now().isoformat()
 
         with open(seances_file, "w", encoding="utf-8") as f:
@@ -109,22 +103,15 @@ def test_single_file_logging():
         downloader3 = TelechargeurSeancesVD(output_folder=str(temp_path))
         result3 = downloader3.scrape_seances()
 
-        if result3["success"]:
-            print(f"   ✅ Succès : {result3['total_count']} séances totales, {result3['new_count']} nouvelles")
-
-            # Vérifier que le nombre total est correct
-            expected_total = result1["total_count"] + 1  # +1 pour la séance ajoutée manuellement
-            if result3["total_count"] == expected_total:
-                print(f"   ✅ Nombre total correct : {result3['total_count']}")
-            else:
-                print(f"   ⚠️  Nombre total incorrect : attendu {expected_total}, obtenu {result3['total_count']}")
-        else:
-            print(f"   ❌ Échec : {result3.get('error', 'Erreur inconnue')}")
-            return False
+        assert result3["success"], f"Échec du troisième lancement : {result3.get('error', 'Erreur inconnue')}"
+        assert (
+            result3["stored_seances"] == result1["stored_seances"] + 1
+        ), "Le nombre de séances stockées doit avoir augmenté de 1"
+        assert result3["new_seances_count"] == 0, "Aucune nouvelle séance doit être ajoutée"
+        print(f"   ✅ Succès : {result3['stored_seances']} séances totales, {result3['new_seances_count']} nouvelles")
 
         print()
         print("=== Test terminé avec succès ===")
-        return True
 
 
 if __name__ == "__main__":

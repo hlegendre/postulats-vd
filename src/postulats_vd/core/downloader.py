@@ -17,7 +17,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 import time
-from config import (
+from ..config import (
     MAX_SESSIONS,
     OUTPUT_FOLDER,
     PAGE_DELAY,
@@ -26,7 +26,7 @@ from config import (
     USER_AGENT,
 )
 from .storage import Storage
-from .logging_utils import LoggingUtils
+from ..utils.logging import LoggingUtils
 
 
 class TelechargeurSeancesVD:

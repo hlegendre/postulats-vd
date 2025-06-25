@@ -509,9 +509,9 @@ wheels = [
 ]
 
 [[package]]
-name = "postulats-dl"
+name = "postulats-vd"
 version = "1.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "lxml" },
