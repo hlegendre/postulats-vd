@@ -12,22 +12,22 @@ Date: 2024
 import re
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 from typing import TypedDict
-import requests
 from bs4 import BeautifulSoup
 import time
 from ..config import (
     MAX_SESSIONS,
     OUTPUT_FOLDER,
     PAGE_DELAY,
-    REQUEST_TIMEOUT,
     STOP_DATE,
-    USER_AGENT,
 )
-from .storage import Storage
+from .storage import Storage, Seance
 from ..utils.logging import LoggingUtils
+from ..utils.html_fetcher import HtmlFetcher
+from ..utils.date_parser import DateParser
+from ..utils.url import extract_base_url
 
 
 class CESessionFinderResult(TypedDict):
@@ -47,55 +47,34 @@ class CESessionFinder:
             output_folder (str): Dossier pour sauvegarder les données extraites
         """
         self.output_folder = Path(output_folder)
-        self.session = requests.Session()
-        self.session.headers.update({"User-Agent": USER_AGENT})
 
-        # Configuration de la journalisation
         self.logger = LoggingUtils.setup_simple_logger("ExtracteurSéances")
-
-        # Initialiser le gestionnaire de stockage
         self.storage = Storage(output_folder=output_folder)
+        self.html_fetcher = HtmlFetcher()
 
-        self.logger.info(f"Découvreur de séances initialisé avec le dossier de sortie : {self.output_folder}")
-        self.logger.info(f"Fichier de séances : {self.storage.get_file_path()}")
+        self.logger.info(f"Découvreur de séances initialisé avec le fichier de sortie : {self.storage.get_file_path()}")
         self.logger.info(f"Séances existantes chargées : {self.storage.get_seance_count()}")
 
-    def get_page_content(self, url):
+    def ajoute_seances_de_la_page(self, html_content: str, base_url: str, current_date: str) -> tuple[int, int, bool]:
         """
-        Récupère le contenu d'une page web.
-
-        Args:
-            url (str): URL à récupérer
-
-        Returns:
-            str: Contenu HTML de la page
-        """
-        try:
-            self.logger.info(f"Récupération de la page : {url}")
-            response = self.session.get(url, timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
-            self.logger.info("Page récupérée avec succès")
-            return response.text
-        except requests.RequestException as e:
-            self.logger.error(f"Erreur lors de la récupération de {url} : {e}")
-            return None
-
-    def extract_seance_links(self, html_content, base_url):
-        """
-        Extrait les liens des séances du Conseil d'État avec leurs dates.
+        Ajoute les séances de la page au stockage.
 
         Args:
             html_content (str): Contenu HTML à analyser
             base_url (str): URL de base pour construire les URLs complètes
+            current_date (str): Date de découverte pour les séances
 
         Returns:
-            list: Liste des dictionnaires contenant l'URL et la date de chaque séance
+            int: Nombre de nouvelles séances trouvées
+            int: Nombre de séances déjà existantes
+            bool: True s'il faut continuer à extraire les séances de la page suivante
         """
-        soup = BeautifulSoup(html_content, "html.parser")
-        seance_links = []
+        nb_nouvelles_seances = 0
+        nb_seances_existantes = 0
 
-        # Pattern pour détecter les liens de séances
-        # Format attendu: "Séance du Conseil d'Etat du [date]"
+        soup = BeautifulSoup(html_content, "html.parser")
+
+        # Pattern pour détecter les liens de séances : "Séance du Conseil d'Etat du [date]"
         seance_pattern = re.compile(r"Séance du Conseil d\'Etat du (\d{1,2}\s+\w+\s+\d{4})", re.IGNORECASE)
 
         # Trouver tous les liens
@@ -115,68 +94,37 @@ class CESessionFinder:
                     # Parser la date
                     try:
                         # Convertir la date française en objet datetime
-                        date_obj = self.parse_french_date(date_str)
+                        date_obj = DateParser.parse_french_date(date_str)
                         formatted_date = date_obj.strftime("%Y-%m-%d")
                     except Exception as e:
-                        self.logger.warning(f"Impossible de parser la date '{date_str}': {e}")
-                        formatted_date = date_str
+                        self.logger.error(f"Impossible de parser la date '{date_str}': {e}")
+                        continue
 
-                    seance_info = {
+                    seance: Seance = {
                         "url": full_url,
                         "date": formatted_date,
                         "date_originale": date_str,
+                        "date_decouverte": current_date,
                         "titre": link_text,
+                        "parties": [],
                     }
 
-                    seance_links.append(seance_info)
-                    self.logger.debug(f"Séance trouvée : {date_str} -> {full_url}")
+                    # Si la date est antérieure à la date limite, on arrête le scraping
+                    if formatted_date < STOP_DATE:
+                        self.logger.info(f"Date limite atteinte ({STOP_DATE}).")
+                        return nb_nouvelles_seances, nb_seances_existantes, False
 
-        return seance_links
+                    # Ajoute la séance au stockage si elle n'existe pas déjà
+                    if self.storage.seance_ajoute(seance):
+                        self.logger.debug(f"Séance trouvée et ajoutée au stockage : {date_str} -> {full_url}")
+                        nb_nouvelles_seances += 1
+                    else:
+                        self.logger.debug(f"Séance déjà existante : {date_str} -> {full_url}")
+                        nb_seances_existantes += 1
 
-    def parse_french_date(self, date_str):
-        """
-        Parse une date française en objet datetime.
+        return nb_nouvelles_seances, nb_seances_existantes, True
 
-        Args:
-            date_str (str): Date au format français (ex: "18 juin 2025")
-
-        Returns:
-            datetime: Objet datetime correspondant
-        """
-        # Mapping des mois français vers les numéros
-        mois_mapping = {
-            "janvier": 1,
-            "février": 2,
-            "mars": 3,
-            "avril": 4,
-            "mai": 5,
-            "juin": 6,
-            "juillet": 7,
-            "août": 8,
-            "septembre": 9,
-            "octobre": 10,
-            "novembre": 11,
-            "décembre": 12,
-        }
-
-        # Pattern pour extraire jour, mois et année
-        pattern = r"(\d{1,2})\s+(\w+)\s+(\d{4})"
-        match = re.search(pattern, date_str.lower())
-
-        if match:
-            jour = int(match.group(1))
-            mois_nom = match.group(2)
-            annee = int(match.group(3))
-
-            if mois_nom in mois_mapping:
-                mois = mois_mapping[mois_nom]
-                return datetime(annee, mois, jour)
-            else:
-                raise ValueError(f"Mois non reconnu: {mois_nom}")
-        else:
-            raise ValueError(f"Format de date non reconnu: {date_str}")
-
-    def extract_pagination_links(self, html_content, base_url):
+    def extract_next_page(self, html_content: str, base_url: str) -> str | None:
         """
         Extrait les liens de pagination pour naviguer vers les pages suivantes.
 
@@ -185,16 +133,15 @@ class CESessionFinder:
             base_url (str): URL de base pour construire les URLs complètes
 
         Returns:
-            list: Liste des URLs des pages suivantes
+            str | None: URL de la page suivante ou None si aucune page suivante n'est trouvée
         """
         soup = BeautifulSoup(html_content, "html.parser")
-        pagination_links = []
 
         # Chercher la pagination
         pagination_nav = soup.find("nav", {"aria-label": "Pagination"})
         if not pagination_nav:
             self.logger.debug("Aucune pagination trouvée")
-            return pagination_links
+            return None
 
         # Chercher les liens "Page suivante" avec la classe spécifique
         next_links = pagination_nav.find_all("a", class_="vd-pagination__link")
@@ -206,139 +153,75 @@ class CESessionFinder:
                 href = link.get("href")
                 if href:
                     full_url = urljoin(base_url, href)
-                    # Éviter les doublons
-                    if full_url not in pagination_links:
-                        pagination_links.append(full_url)
-                        self.logger.debug(f"Lien de pagination trouvé : {full_url}")
+                    self.logger.debug(f"Lien de pagination trouvé : {full_url}")
+                    return full_url
 
-        # Si aucun lien "suivante" trouvé, essayer d'extraire le numéro de page actuel
-        # et construire le lien vers la page suivante
-        if not pagination_links:
-            # Chercher le numéro de page actuel dans l'URL ou dans le contenu
-            current_page_match = re.search(r"page%5D=(\d+)", html_content)
-            if current_page_match:
-                current_page = int(current_page_match.group(1))
-                next_page = current_page + 1
-                # Construire l'URL de la page suivante
-                next_url = f"{base_url}/actualites/decisions-du-conseil-detat?tx_vdsafarinet_safarinet%5Bcontroller%5D=Meeting&tx_vdsafarinet_safarinet%5Bpage%5D={next_page}"
-                pagination_links.append(next_url)
-                self.logger.debug(f"Lien de pagination construit : {next_url}")
+        return None
 
-        return pagination_links
-
-    def should_stop_scraping(self, seance_date):
-        """
-        Détermine si le scraping doit s'arrêter basé sur la date de la séance.
-
-        Args:
-            seance_date (str): Date de la séance au format 'YYYY-MM-DD'
-
-        Returns:
-            bool: True si le scraping doit s'arrêter
-        """
-        if STOP_DATE is None:
-            return False
-
-        try:
-            seance_dt = datetime.strptime(seance_date, "%Y-%m-%d")
-            stop_dt = datetime.strptime(STOP_DATE, "%Y-%m-%d")
-            return seance_dt < stop_dt
-        except ValueError as e:
-            self.logger.warning(f"Erreur lors de la comparaison des dates : {e}")
-            return False
-
-    def scrape_seances(
-        self, target_url="https://www.vd.ch/actualites/decisions-du-conseil-detat"
-    ) -> CESessionFinderResult:
+    def scrape_seances(self) -> CESessionFinderResult:
         """
         Méthode principale pour extraire les séances du Conseil d'État avec pagination.
 
         Args:
-            target_url (str): URL de la page à extraire (utilise TARGET_URL par défaut)
-
         Returns:
             dict: Résumé de l'extraction
         """
-        self.logger.info(f"Début de l'extraction des séances depuis : {target_url}")
-
-        # Définir la date de découverte une seule fois pour toute la session
         current_date = datetime.now().isoformat()
-        self.logger.info(f"Date de découverte pour cette session : {current_date}")
+        self.logger.debug(f"Date de découverte pour cette session : {current_date}")
+
+        first_url = "https://www.vd.ch/actualites/decisions-du-conseil-detat"
+        self.logger.info(f"Début de l'extraction des séances depuis : {first_url}")
 
         # Détection automatique de l'URL de base depuis l'URL cible
-        parsed_url = urlparse(target_url)
-        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+        base_url = extract_base_url(first_url)
 
         new_seances_count = 0
-        pages_processed = 0
         stop_reached = False
-        current_url = target_url
+        current_url = first_url
         visited_urls = set()  # Pour éviter les boucles infinies
 
-        while current_url and pages_processed < MAX_SESSIONS and not stop_reached:
+        while current_url and len(visited_urls) < MAX_SESSIONS and not stop_reached:
             # Vérifier si l'URL a déjà été visitée
             if current_url in visited_urls:
-                self.logger.warning(f"URL déjà visitée, arrêt pour éviter la boucle infinie : {current_url}")
+                self.logger.debug(f"URL déjà visitée, arrêt pour éviter la boucle infinie : {current_url}")
                 break
 
             visited_urls.add(current_url)
-            pages_processed += 1  # Incrémenter le compteur au début du traitement de chaque page
-            self.logger.debug(f"Traitement de la page {pages_processed} : {current_url}")
+            self.logger.debug(f"Traitement de la page {len(visited_urls)} : {current_url}")
 
             # Récupérer le contenu de la page
-            html_content = self.get_page_content(current_url)
+            html_content = self.html_fetcher.fetch_html_string(current_url)
             if not html_content:
-                self.logger.error(f"Échec de la récupération du contenu de la page {pages_processed}")
+                self.logger.error(f"Échec de la récupération du contenu de la page {current_url}")
                 break
 
             # Extraire les liens des séances
-            page_seances = self.extract_seance_links(html_content, base_url)
+            nb_nouv, nb_exist, cont = self.ajoute_seances_de_la_page(html_content, base_url, current_date)
 
-            if not page_seances:
-                self.logger.warning(f"Aucune séance trouvée sur la page {pages_processed}")
-                break
+            self.logger.info(
+                f"Séances trouvées sur la page {len(visited_urls)} : {nb_nouv} nouvelle(s), {nb_exist} existante(s)"
+            )
+            new_seances_count += nb_nouv
 
-            self.logger.info(f"Nombre de séances trouvées sur la page {pages_processed} : {len(page_seances)}")
-
-            # Traiter chaque séance de la page
-            page_new_seances = 0
-            for seance in page_seances:
-                # Vérifier si on doit s'arrêter basé sur la date
-                if self.should_stop_scraping(seance["date"]):
-                    self.logger.info(f"Date limite atteinte ({STOP_DATE}). Séance trouvée : {seance['date']}")
-                    stop_reached = True
-                    break
-
-                # Ajouter la séance au stockage
-                if self.storage.seance_ajoute(seance, current_date):
-                    page_new_seances += 1
-                    new_seances_count += 1
-
-            if stop_reached:
+            if not cont:
                 break
 
             # Extraire les liens de pagination pour la page suivante
-            pagination_links = self.extract_pagination_links(html_content, base_url)
+            current_url = self.extract_next_page(html_content, base_url)
 
-            if pagination_links:
-                current_url = pagination_links[0]  # Prendre le premier lien de pagination
-
-                # Délai entre les requêtes pour être respectueux
-                if PAGE_DELAY > 0:
-                    self.logger.debug(f"Attente de {PAGE_DELAY} seconde(s) avant la prochaine requête")
-                    time.sleep(PAGE_DELAY)
-            else:
-                self.logger.info("Aucun lien de pagination trouvé, fin du scraping")
-                break
+            # Délai entre les requêtes pour être respectueux
+            if current_url and PAGE_DELAY > 0:
+                self.logger.debug(f"Attente de {PAGE_DELAY} seconde(s) avant la prochaine requête")
+                time.sleep(PAGE_DELAY)
 
         stored_seances = self.storage.get_seance_count()
 
-        self.logger.info(f"Nombre de nouvelles séances trouvées sur {pages_processed} pages : {new_seances_count}")
+        self.logger.info(f"Nombre de nouvelles séances trouvées sur {len(visited_urls)} pages : {new_seances_count}")
         self.logger.info(f"Nombre total de séances stockées : {stored_seances}")
 
         return {
             "success": True,
-            "pages_processed": pages_processed,
+            "pages_processed": len(visited_urls),
             "new_seances_count": new_seances_count,
             "stored_seances": stored_seances,
             "stop_reached": stop_reached,

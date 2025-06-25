@@ -12,8 +12,108 @@ Date: 2024
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, TypedDict
 from ..utils.logging import LoggingUtils
+
+
+class SeanceFichier(TypedDict):
+    url: str
+    nom: str
+
+    @staticmethod
+    def check_type(data: Any) -> bool:
+        return (
+            isinstance(data, dict)
+            and "url" in data
+            and "nom" in data
+            and isinstance(data["url"], str)
+            and isinstance(data["nom"], str)
+        )
+
+
+class SeancePartie(TypedDict):
+    titre: str
+    fichier: list[SeanceFichier]
+
+    @staticmethod
+    def check_type(data: Any) -> bool:
+        return (
+            isinstance(data, dict)
+            and "titre" in data
+            and isinstance(data["titre"], str)
+            and "fichier" in data
+            and isinstance(data["fichier"], list)
+            and all(SeanceFichier.check_type(fichier) for fichier in data["fichier"])
+        )
+
+
+class Seance(TypedDict):
+    url: str
+    date: str
+    date_decouverte: str
+    date_originale: str
+    titre: str
+    parties: Optional[list[SeancePartie]]
+
+    @staticmethod
+    def check_type(data: Any) -> bool:
+        return (
+            isinstance(data, dict)
+            and "url" in data
+            and isinstance(data["url"], str)
+            and "date" in data
+            and isinstance(data["date"], str)
+            and "date_decouverte" in data
+            and isinstance(data["date_decouverte"], str)
+            and "date_originale" in data
+            and isinstance(data["date_originale"], str)
+            and "titre" in data
+            and isinstance(data["titre"], str)
+            and "parties" in data
+            and isinstance(data["parties"], list)
+            and all(SeancePartie.check_type(partie) for partie in data["parties"])
+        )
+
+
+class StorageMetadonnees(TypedDict):
+    url_source: str
+    derniere_mise_a_jour: str
+    total_seances: int
+
+    @staticmethod
+    def check_type(data: Any) -> bool:
+        return (
+            isinstance(data, dict)
+            and "url_source" in data
+            and isinstance(data["url_source"], str)
+            and "derniere_mise_a_jour" in data
+            and isinstance(data["derniere_mise_a_jour"], str)
+            and "total_seances" in data
+            and isinstance(data["total_seances"], int)
+        )
+
+
+class StorageData(TypedDict):
+    metadonnees: StorageMetadonnees
+    seances: list[Seance]
+
+    @staticmethod
+    def check_type(data: Any) -> bool:
+        return (
+            isinstance(data, dict)
+            and "metadonnees" in data
+            and StorageMetadonnees.check_type(data["metadonnees"])
+            and "seances" in data
+            and isinstance(data["seances"], list)
+            and all(Seance.check_type(seance) for seance in data["seances"])
+        )
+
+    @staticmethod
+    def load_from_json(data: Any) -> Optional["StorageData"]:
+        storage_data = json.loads(data)
+        if not StorageData.check_type(storage_data):
+            raise ValueError("Données JSON invalides")
+        return storage_data
 
 
 class Storage:
@@ -46,17 +146,17 @@ class Storage:
         self.output_folder.mkdir(parents=True, exist_ok=True)
 
         # Charger les séances existantes
-        self._seances_cache = self._load_existing_seances()
+        self._seances_cache: Dict[str, Seance] = self._load()
 
         self.logger.debug(f"Storage initialisé avec le fichier : {self.storage_file}")
         self.logger.debug(f"Séances existantes chargées : {len(self._seances_cache)}")
 
-    def _load_existing_seances(self) -> Dict[str, Dict[str, Any]]:
+    def _load(self) -> Dict[str, Seance]:
         """
         Charge les séances existantes depuis le fichier JSON.
 
         Returns:
-            dict: Dictionnaire des séances existantes avec l'URL comme clé
+            dict: Dictionnaire des séances existantes avec la date comme clé
         """
         if not self.storage_file.exists():
             self.logger.warning("Aucun fichier de stockage existant trouvé, il sera créé au premier ajout de données")
@@ -64,33 +164,26 @@ class Storage:
 
         try:
             with open(self.storage_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                seances = data.get("seances", [])
+                data = StorageData.load_from_json(f.read())
+                return {seance["date"]: seance for seance in data["seances"]}
 
-                # Créer un dictionnaire avec l'URL comme clé pour un accès rapide
-                existing_seances = {}
-                for seance in seances:
-                    existing_seances[seance["url"]] = seance
-
-                return existing_seances
-
-        except (json.JSONDecodeError, FileNotFoundError) as e:
+        except (ValueError, json.JSONDecodeError, FileNotFoundError) as e:
             self.logger.warning(f"Erreur lors du chargement des séances existantes : {e}")
             return {}
 
-    def seance_existe(self, url: str) -> bool:
+    def seance_existe(self, date: str) -> bool:
         """
         Vérifie si une séance existe déjà.
 
         Args:
-            url (str): URL de la séance à vérifier
+            date (str): Date de la séance à vérifier (format: "YYYY-MM-DD")
 
         Returns:
             bool: True si la séance existe, False sinon
         """
-        return url in self._seances_cache
+        return date in self._seances_cache
 
-    def seance_ajoute(self, details: Dict[str, Any], date_decouverte: str) -> bool:
+    def seance_ajoute(self, seance: Seance) -> bool:
         """
         Ajoute une nouvelle séance si elle n'existe pas déjà.
 
@@ -101,28 +194,17 @@ class Storage:
         Returns:
             bool: True si la séance a été ajoutée, False si elle existait déjà
         """
-        url = details.get("url")
-        if not url:
-            self.logger.error("URL manquante dans les détails de la séance")
+        if self.seance_existe(seance["date"]):
+            self.logger.debug(f"Séance déjà existante ignorée : {seance['date']}")
             return False
-
-        if self.seance_existe(url):
-            self.logger.debug(f"Séance déjà existante ignorée : {url}")
-            return False
-
-        # Ajouter la date de découverte
-        seance_complete = details.copy()
-        seance_complete["date_decouverte"] = date_decouverte
 
         # Ajouter au cache
-        self._seances_cache[url] = seance_complete
+        self._seances_cache[seance["date"]] = seance
 
         # Sauvegarder immédiatement
         self._save_to_file()
 
-        self.logger.debug(
-            f"Nouvelle séance sauvegardée : {seance_complete.get('date', 'N/A')} - {seance_complete.get('titre', 'N/A')}"
-        )
+        self.logger.debug(f"Nouvelle séance sauvegardée : {seance['date']} - {seance['titre']}")
         return True
 
     def _save_to_file(self):
@@ -168,18 +250,6 @@ class Storage:
             int: Nombre de séances
         """
         return len(self._seances_cache)
-
-    def get_seance_by_url(self, url: str) -> Optional[Dict[str, Any]]:
-        """
-        Récupère une séance spécifique par son URL.
-
-        Args:
-            url (str): URL de la séance
-
-        Returns:
-            dict: Détails de la séance ou None si non trouvée
-        """
-        return self._seances_cache.get(url)
 
     def get_file_path(self) -> str:
         """
