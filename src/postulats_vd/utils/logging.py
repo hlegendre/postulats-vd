@@ -49,6 +49,14 @@ class LoggingUtils:
         if logger.handlers:
             return logger
 
+        # Vérifier si le logging global a déjà été configuré avec basicConfig
+        # Si c'est le cas, ne pas ajouter de handlers supplémentaires
+        root_logger = logging.getLogger()
+        if root_logger.handlers:
+            # Le logging global est déjà configuré, on retourne juste le logger
+            # sans ajouter de handlers supplémentaires
+            return logger
+
         # Gestionnaire console
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
