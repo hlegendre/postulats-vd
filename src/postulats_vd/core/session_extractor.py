@@ -38,13 +38,13 @@ def _parse_partie(soup: BeautifulSoup) -> SeancePartie:
 
 def _parse_seance(soup: BeautifulSoup) -> List[SeancePartie]:
     """
-    Extrait toutes les parties d'une séance
+    Extrait toutes les discussions d'une séance
 
     Args:
         soup: l'objet BeautifulSoup de la page de la séance
 
     Returns:
-        Liste de parties
+        Liste de discussions
     """
     parts = soup.select("#main .col-md-12.pl-0.pr-0")
 
@@ -92,10 +92,10 @@ class SessionExtractor:
 
         try:
             soup = BeautifulSoup(html_content, "html.parser")
-            seance["parties"] = _parse_seance(soup)
+            seance["discussions"] = _parse_seance(soup)
 
             self.storage.seance_upsert(seance)
-            self.logger.info(f"Séance \"{seance["date"]}\" extraite : {len(seance['parties'])} parties")
+            self.logger.info(f"Séance \"{seance["date"]}\" extraite : {len(seance['discussions'])} discussions")
             return True
         except Exception as e:
             self.logger.error(f"Erreur lors de l'extraction de la séance {seance['date']}: {e}")
@@ -111,7 +111,7 @@ class SessionExtractor:
             int: Nombre de séances déjà traitées
         """
         all_seances = self.storage.seances_get()
-        todo_seances = list(filter(lambda s: len(s.get("parties", [])) == 0, all_seances))
+        todo_seances = list(filter(lambda s: len(s.get("discussions", [])) == 0, all_seances))
 
         nb_extracted = 0
         nb_error = 0

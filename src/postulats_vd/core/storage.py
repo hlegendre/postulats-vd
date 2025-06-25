@@ -54,7 +54,7 @@ class Seance(TypedDict):
     date_decouverte: str
     date_originale: str
     titre: str
-    parties: list[SeancePartie]
+    discussions: list[SeancePartie]
 
     @staticmethod
     def check_type(data: Any) -> bool:
@@ -70,9 +70,9 @@ class Seance(TypedDict):
             and isinstance(data["date_originale"], str)
             and "titre" in data
             and isinstance(data["titre"], str)
-            and "parties" in data
-            and isinstance(data["parties"], list)
-            and all(SeancePartie.check_type(partie) for partie in data["parties"])
+            and "discussions" in data
+            and isinstance(data["discussions"], list)
+            and all(SeancePartie.check_type(partie) for partie in data["discussions"])
         )
 
 

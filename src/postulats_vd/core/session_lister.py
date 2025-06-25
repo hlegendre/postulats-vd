@@ -103,7 +103,7 @@ class SessionLister:
                         "date_originale": date_str,
                         "date_decouverte": current_date,
                         "titre": link_text,
-                        "parties": [],
+                        "discussions": [],
                     }
 
                     self.storage.seance_upsert(seance)

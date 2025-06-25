@@ -87,7 +87,7 @@ def test_single_file_logging():
             "date_originale": "2025-06-25",
             "titre": "Séance du Conseil d'Etat du 25 juin 2025",
             "date_decouverte": datetime.now().isoformat(),
-            "parties": [],
+            "discussions": [],
         }
         seances.append(new_seance)
 

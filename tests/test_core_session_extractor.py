@@ -101,12 +101,12 @@ def test_parse_partie_without_h2():
 
 
 def test_parse_seance_with_multiple_parts():
-    """Test de l'extraction d'une séance avec plusieurs parties."""
+    """Test de l'extraction d'une séance avec plusieurs discussions."""
 
-    print("=== Test d'extraction d'une séance avec plusieurs parties ===")
+    print("=== Test d'extraction d'une séance avec plusieurs discussions ===")
     print()
 
-    # Créer un HTML de test avec plusieurs parties
+    # Créer un HTML de test avec plusieurs discussions
     test_html = """
     <div id="main">
         <div class="col-md-12 pl-0 pr-0">
@@ -122,20 +122,20 @@ def test_parse_seance_with_multiple_parts():
     """
 
     soup = BeautifulSoup(test_html, "html.parser")
-    parties = _parse_seance(soup)
+    discussions = _parse_seance(soup)
 
-    # Vérifier que toutes les parties ont été extraites
-    assert len(parties) == 2, "Deux parties devraient être extraites"
+    # Vérifier que toutes les discussions ont été extraites
+    assert len(discussions) == 2, "Deux discussions devraient être extraites"
 
     # Vérifier la première partie
-    assert parties[0]["titre"] == "Partie 1", "Le titre de la première partie devrait être correct"
-    assert len(parties[0]["fichiers"]) == 1, "La première partie devrait avoir 1 fichier"
+    assert discussions[0]["titre"] == "Partie 1", "Le titre de la première partie devrait être correct"
+    assert len(discussions[0]["fichiers"]) == 1, "La première partie devrait avoir 1 fichier"
 
     # Vérifier la deuxième partie
-    assert parties[1]["titre"] == "Partie 2", "Le titre de la deuxième partie devrait être correct"
-    assert len(parties[1]["fichiers"]) == 2, "La deuxième partie devrait avoir 2 fichiers"
+    assert discussions[1]["titre"] == "Partie 2", "Le titre de la deuxième partie devrait être correct"
+    assert len(discussions[1]["fichiers"]) == 2, "La deuxième partie devrait avoir 2 fichiers"
 
-    print("   ✅ Séance avec plusieurs parties extraite correctement")
+    print("   ✅ Séance avec plusieurs discussions extraite correctement")
     print()
 
 
@@ -160,7 +160,7 @@ def test_extract_seance_success():
             "date_originale": "1er janvier 2025",
             "date_decouverte": datetime.now().isoformat(),
             "titre": "Séance du Conseil d'Etat du 1er janvier 2025",
-            "parties": [],
+            "discussions": [],
         }
 
         # Mock du HTML fetcher pour retourner du contenu valide
@@ -178,8 +178,8 @@ def test_extract_seance_success():
 
         # Vérifier que l'extraction a réussi
         assert success, "L'extraction de la séance devrait réussir"
-        assert len(test_seance["parties"]) == 1, "La séance devrait avoir 1 partie"
-        assert test_seance["parties"][0]["titre"] == "Partie 1", "Le titre de la partie devrait être correct"
+        assert len(test_seance["discussions"]) == 1, "La séance devrait avoir 1 partie"
+        assert test_seance["discussions"][0]["titre"] == "Partie 1", "Le titre de la partie devrait être correct"
 
         # Vérifier que la séance a été sauvegardée dans le storage
         saved_seance = storage.seances_get()[0]

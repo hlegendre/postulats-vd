@@ -40,7 +40,7 @@ def test_storage():
             "date_originale": "15 janvier 2025",
             "date_decouverte": datetime.now().isoformat(),
             "titre": "Séance du Conseil d'Etat du 15 janvier 2025",
-            "parties": [],
+            "discussions": [],
         }
 
         ajoutee = storage.seance_upsert(seance_details)
@@ -66,7 +66,7 @@ def test_storage():
             "date_originale": "22 janvier 2025",
             "date_decouverte": datetime.now().isoformat(),
             "titre": "Séance du Conseil d'Etat du 22 janvier 2025",
-            "parties": [],
+            "discussions": [],
         }
 
         ajoutee_2 = storage.seance_upsert(seance_details_2)

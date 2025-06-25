@@ -11,7 +11,7 @@ Ce script permet d'extraire automatiquement les informations détaillées des s�
 - **Parsing des dates françaises** : Conversion automatique des dates françaises en format ISO
 - **Pagination automatique** : Parcourt automatiquement toutes les pages disponibles
 - **Arrêt conditionnel** : Possibilité de s'arrêter à une date limite configurée
-- **Extraction des parties et fichiers** : Pour chaque séance, toutes les parties et fichiers associés sont extraits
+- **Extraction des discussions et fichiers** : Pour chaque séance, toutes les discussions et fichiers associés sont extraits
 
 ## Structure du fichier JSON
 
@@ -31,7 +31,7 @@ Le script génère un fichier unique `output/storage.json` avec la structure sui
       "date_originale": "2025-06-18",
       "date_decouverte": "2025-06-25T15:52:17.868910",
       "titre": "Séance du Conseil d'Etat du 18 juin 2025",
-      "parties": [
+      "discussions": [
         {
           "titre": "Un nouveau bâtiment pour la Haute école pédagogique à Chavannes-près-Renens",
           "fichiers": [
@@ -58,9 +58,9 @@ Le script génère un fichier unique `output/storage.json` avec la structure sui
 - `date_originale` : Date originale (format source)
 - `date_decouverte` : Date et heure de première découverte de cette séance
 - `titre` : Titre de la séance
-- `parties` : Liste des parties de la séance
+- `discussions` : Liste des discussions de la séance
 
-### Champs des parties
+### Champs des discussions
 
 - `titre` : Titre de la partie
 - `fichiers` : Liste des fichiers associés à cette partie
@@ -200,7 +200,7 @@ git commit --no-verify -m "message d'urgence"
 - Crée le fichier `output/storage.json`
 - Extrait toutes les séances disponibles depuis toutes les pages
 - Ajoute la métadonnée `date_decouverte` à chaque séance
-- Extrait toutes les parties et fichiers associés à chaque séance
+- Extrait toutes les discussions et fichiers associés à chaque séance
 
 ### Lancements suivants
 
@@ -218,7 +218,7 @@ git commit --no-verify -m "message d'urgence"
 4. **Historique** : Conservation de l'historique complet des découvertes
 5. **Pagination automatique** : Parcourt toutes les pages sans intervention
 6. **Arrêt intelligent** : S'arrête automatiquement à la date limite configurée
-7. **Extraction complète** : Toutes les parties et fichiers sont extraits pour chaque séance
+7. **Extraction complète** : Toutes les discussions et fichiers sont extraits pour chaque séance
 
 ## Tests
 
@@ -234,7 +234,7 @@ Les tests vérifient :
 - L'ignorance des séances déjà connues
 - La détection des nouvelles séances
 - La conservation des métadonnées de découverte
-- L'extraction correcte des parties et fichiers
+- L'extraction correcte des discussions et fichiers
 
 ## Configuration
 
