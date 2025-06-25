@@ -47,13 +47,9 @@ class TelechargeurSeancesVD:
         # Initialiser le gestionnaire de stockage
         self.storage = Storage(output_folder=output_folder)
 
-        self.logger.info(
-            f"Téléchargeur de séances initialisé avec le dossier de sortie : {self.output_folder}"
-        )
+        self.logger.info(f"Téléchargeur de séances initialisé avec le dossier de sortie : {self.output_folder}")
         self.logger.info(f"Fichier de séances : {self.storage.get_file_path()}")
-        self.logger.info(
-            f"Séances existantes chargées : {self.storage.get_seance_count()}"
-        )
+        self.logger.info(f"Séances existantes chargées : {self.storage.get_seance_count()}")
 
     def get_page_content(self, url):
         """
@@ -91,9 +87,7 @@ class TelechargeurSeancesVD:
 
         # Pattern pour détecter les liens de séances
         # Format attendu: "Séance du Conseil d'Etat du [date]"
-        seance_pattern = re.compile(
-            r"Séance du Conseil d\'Etat du (\d{1,2}\s+\w+\s+\d{4})", re.IGNORECASE
-        )
+        seance_pattern = re.compile(r"Séance du Conseil d\'Etat du (\d{1,2}\s+\w+\s+\d{4})", re.IGNORECASE)
 
         # Trouver tous les liens
         links = soup.find_all("a", href=True)
@@ -115,9 +109,7 @@ class TelechargeurSeancesVD:
                         date_obj = self.parse_french_date(date_str)
                         formatted_date = date_obj.strftime("%Y-%m-%d")
                     except Exception as e:
-                        self.logger.warning(
-                            f"Impossible de parser la date '{date_str}': {e}"
-                        )
+                        self.logger.warning(f"Impossible de parser la date '{date_str}': {e}")
                         formatted_date = date_str
 
                     seance_info = {
@@ -246,9 +238,7 @@ class TelechargeurSeancesVD:
             self.logger.warning(f"Erreur lors de la comparaison des dates : {e}")
             return False
 
-    def scrape_seances(
-        self, target_url="https://www.vd.ch/actualites/decisions-du-conseil-detat"
-    ):
+    def scrape_seances(self, target_url="https://www.vd.ch/actualites/decisions-du-conseil-detat"):
         """
         Méthode principale pour extraire les séances du Conseil d'État avec pagination.
 
@@ -277,48 +267,34 @@ class TelechargeurSeancesVD:
         while current_url and pages_processed < MAX_SESSIONS and not stop_reached:
             # Vérifier si l'URL a déjà été visitée
             if current_url in visited_urls:
-                self.logger.warning(
-                    f"URL déjà visitée, arrêt pour éviter la boucle infinie : {current_url}"
-                )
+                self.logger.warning(f"URL déjà visitée, arrêt pour éviter la boucle infinie : {current_url}")
                 break
 
             visited_urls.add(current_url)
-            pages_processed += (
-                1  # Incrémenter le compteur au début du traitement de chaque page
-            )
-            self.logger.debug(
-                f"Traitement de la page {pages_processed} : {current_url}"
-            )
+            pages_processed += 1  # Incrémenter le compteur au début du traitement de chaque page
+            self.logger.debug(f"Traitement de la page {pages_processed} : {current_url}")
 
             # Récupérer le contenu de la page
             html_content = self.get_page_content(current_url)
             if not html_content:
-                self.logger.error(
-                    f"Échec de la récupération du contenu de la page {pages_processed}"
-                )
+                self.logger.error(f"Échec de la récupération du contenu de la page {pages_processed}")
                 break
 
             # Extraire les liens des séances
             page_seances = self.extract_seance_links(html_content, base_url)
 
             if not page_seances:
-                self.logger.warning(
-                    f"Aucune séance trouvée sur la page {pages_processed}"
-                )
+                self.logger.warning(f"Aucune séance trouvée sur la page {pages_processed}")
                 break
 
-            self.logger.info(
-                f"Nombre de séances trouvées sur la page {pages_processed} : {len(page_seances)}"
-            )
+            self.logger.info(f"Nombre de séances trouvées sur la page {pages_processed} : {len(page_seances)}")
 
             # Traiter chaque séance de la page
             page_new_seances = 0
             for seance in page_seances:
                 # Vérifier si on doit s'arrêter basé sur la date
                 if self.should_stop_scraping(seance["date"]):
-                    self.logger.info(
-                        f"Date limite atteinte ({STOP_DATE}). Séance trouvée : {seance['date']}"
-                    )
+                    self.logger.info(f"Date limite atteinte ({STOP_DATE}). Séance trouvée : {seance['date']}")
                     stop_reached = True
                     break
 
@@ -334,15 +310,11 @@ class TelechargeurSeancesVD:
             pagination_links = self.extract_pagination_links(html_content, base_url)
 
             if pagination_links:
-                current_url = pagination_links[
-                    0
-                ]  # Prendre le premier lien de pagination
+                current_url = pagination_links[0]  # Prendre le premier lien de pagination
 
                 # Délai entre les requêtes pour être respectueux
                 if PAGE_DELAY > 0:
-                    self.logger.debug(
-                        f"Attente de {PAGE_DELAY} seconde(s) avant la prochaine requête"
-                    )
+                    self.logger.debug(f"Attente de {PAGE_DELAY} seconde(s) avant la prochaine requête")
                     time.sleep(PAGE_DELAY)
             else:
                 self.logger.info("Aucun lien de pagination trouvé, fin du scraping")
@@ -350,9 +322,7 @@ class TelechargeurSeancesVD:
 
         stored_seances = self.storage.get_seance_count()
 
-        self.logger.info(
-            f"Nombre de nouvelles séances trouvées sur {pages_processed} pages : {new_seances_count}"
-        )
+        self.logger.info(f"Nombre de nouvelles séances trouvées sur {pages_processed} pages : {new_seances_count}")
         self.logger.info(f"Nombre total de séances stockées : {stored_seances}")
 
         return {

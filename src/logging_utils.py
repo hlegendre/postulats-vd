@@ -32,9 +32,7 @@ class LoggingUtils:
         return logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     @staticmethod
-    def setup_logger(
-        name: str, formatter: Optional[logging.Formatter] = get_default_formatter()
-    ) -> logging.Logger:
+    def setup_logger(name: str, formatter: Optional[logging.Formatter] = get_default_formatter()) -> logging.Logger:
         """
         Configure et retourne un logger avec les paramètres spécifiés.
 

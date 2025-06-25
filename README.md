@@ -62,7 +62,7 @@ pip install -e .
 ### Exécution
 
 ```bash
-python downloader.py
+python run.py
 ```
 
 ### Sortie
@@ -92,6 +92,70 @@ Délai entre les pages : 1 seconde(s)
 📁 Fichier JSON : seances/seances_conseil_etat.json
 
 ℹ️  Aucune nouvelle séance ajoutée
+```
+
+## Qualité du Code
+
+### Outils de qualité
+
+Le projet utilise plusieurs outils pour maintenir la qualité du code :
+
+- **Black** : Formateur de code automatique
+- **Flake8** : Linter pour détecter les erreurs de style et de logique
+- **Pre-commit hooks** : Vérifications automatiques avant chaque commit
+
+### Installation des hooks pre-commit
+
+Pour installer les hooks pre-commit automatiquement :
+
+```bash
+./setup.sh
+```
+
+Ou manuellement :
+
+```bash
+chmod +x .git/hooks/pre-commit
+```
+
+### Utilisation des outils de qualité
+
+**Formater le code avec Black :**
+
+```bash
+uv run black .
+```
+
+**Vérifier le formatage sans modification :**
+
+```bash
+uv run black --check .
+```
+
+**Linter le code avec Flake8 :**
+
+```bash
+uv run flake8 .
+```
+
+**Tester manuellement le hook pre-commit :**
+
+```bash
+.git/hooks/pre-commit
+```
+
+### Comportement des hooks
+
+Le hook pre-commit s'exécute automatiquement avant chaque commit et :
+
+1. **Vérifie le formatage** : S'assure que le code respecte les standards Black
+2. **Lance le linter** : Détecte les erreurs de style et de logique avec Flake8
+3. **Bloque le commit** : Si des erreurs sont trouvées, le commit est annulé
+
+**Pour ignorer le hook (urgence uniquement) :**
+
+```bash
+git commit --no-verify -m "message d'urgence"
 ```
 
 ## Comportement
@@ -124,7 +188,7 @@ Délai entre les pages : 1 seconde(s)
 Exécuter les tests :
 
 ```bash
-python test_downloader.py
+uv run pytest
 ```
 
 Les tests vérifient :

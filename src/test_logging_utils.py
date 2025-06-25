@@ -5,7 +5,6 @@ Test de la classe LoggingUtils
 Ce script teste les fonctionnalités de la classe utilitaire de logging.
 """
 
-import logging
 from .logging_utils import LoggingUtils
 
 

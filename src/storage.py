@@ -11,7 +11,6 @@ Date: 2024
 """
 
 import json
-import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -74,9 +73,7 @@ class Storage:
             dict: Dictionnaire des séances existantes avec l'URL comme clé
         """
         if not self.storage_file.exists():
-            self.logger.warning(
-                "Aucun fichier de stockage existant trouvé, il sera créé au premier ajout de données"
-            )
+            self.logger.warning("Aucun fichier de stockage existant trouvé, il sera créé au premier ajout de données")
             return {}
 
         try:
@@ -92,9 +89,7 @@ class Storage:
                 return existing_seances
 
         except (json.JSONDecodeError, FileNotFoundError) as e:
-            self.logger.warning(
-                f"Erreur lors du chargement des séances existantes : {e}"
-            )
+            self.logger.warning(f"Erreur lors du chargement des séances existantes : {e}")
             return {}
 
     def seance_existe(self, url: str) -> bool:
@@ -149,9 +144,7 @@ class Storage:
         Sauvegarde toutes les séances dans le fichier JSON.
         """
         # Trier les séances par date (plus récentes en premier)
-        seances_sorted = sorted(
-            self._seances_cache.values(), key=lambda x: x.get("date", ""), reverse=True
-        )
+        seances_sorted = sorted(self._seances_cache.values(), key=lambda x: x.get("date", ""), reverse=True)
 
         data = {
             "metadonnees": {
@@ -166,9 +159,7 @@ class Storage:
             with open(self.storage_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
 
-            self.logger.debug(
-                f"Fichier sauvegardé : {self.storage_file} ({len(seances_sorted)} séances)"
-            )
+            self.logger.debug(f"Fichier sauvegardé : {self.storage_file} ({len(seances_sorted)} séances)")
 
         except Exception as e:
             self.logger.error(f"Erreur lors de la sauvegarde : {e}")

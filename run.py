@@ -7,7 +7,6 @@ from config import (
 )
 from src.downloader import TelechargeurSeancesVD
 import logging
-from src.logging_utils import LoggingUtils
 
 
 def main():
@@ -37,9 +36,7 @@ def main():
             print(f"🛑 Arrêt anticipé : date limite ({STOP_DATE}) atteinte")
 
         if result["new_seances_count"] > 0:
-            print(
-                f"\nℹ️  {result['new_seances_count']} nouvelles séances ont été ajoutées au stockage"
-            )
+            print(f"\nℹ️  {result['new_seances_count']} nouvelles séances ont été ajoutées au stockage")
         else:
             print(f"\nℹ️  Aucune nouvelle séance ajoutée")
     else:

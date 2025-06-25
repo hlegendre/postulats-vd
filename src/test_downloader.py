@@ -30,9 +30,7 @@ def test_single_file_logging():
         result1 = downloader1.scrape_seances()
 
         if result1["success"]:
-            print(
-                f"   ✅ Succès : {result1['total_count']} séances totales, {result1['new_count']} nouvelles"
-            )
+            print(f"   ✅ Succès : {result1['total_count']} séances totales, {result1['new_count']} nouvelles")
 
             # Vérifier que le fichier existe
             seances_file = temp_path / "seances_conseil_etat.json"
@@ -46,22 +44,14 @@ def test_single_file_logging():
                     print(f"   📊 {len(seances)} séances dans le fichier")
 
                     # Vérifier que toutes les séances ont une date de découverte
-                    seances_with_discovery = [
-                        s for s in seances if "date_decouverte" in s
-                    ]
-                    print(
-                        f"   🕒 {len(seances_with_discovery)} séances avec date de découverte"
-                    )
+                    seances_with_discovery = [s for s in seances if "date_decouverte" in s]
+                    print(f"   🕒 {len(seances_with_discovery)} séances avec date de découverte")
 
                     if seances:
                         first_seance = seances[0]
-                        print(
-                            f"   📅 Première séance : {first_seance['date']} - {first_seance['titre']}"
-                        )
+                        print(f"   📅 Première séance : {first_seance['date']} - {first_seance['titre']}")
                         if "date_decouverte" in first_seance:
-                            print(
-                                f"   🔍 Découverte le : {first_seance['date_decouverte']}"
-                            )
+                            print(f"   🔍 Découverte le : {first_seance['date_decouverte']}")
         else:
             print(f"   ❌ Échec : {result1.get('error', 'Erreur inconnue')}")
             return False
@@ -74,16 +64,12 @@ def test_single_file_logging():
         result2 = downloader2.scrape_seances()
 
         if result2["success"]:
-            print(
-                f"   ✅ Succès : {result2['total_count']} séances totales, {result2['new_count']} nouvelles"
-            )
+            print(f"   ✅ Succès : {result2['total_count']} séances totales, {result2['new_count']} nouvelles")
 
             if result2["new_count"] == 0:
                 print("   ✅ Aucune nouvelle séance ajoutée (comportement attendu)")
             else:
-                print(
-                    f"   ⚠️  {result2['new_count']} nouvelles séances ajoutées (inattendu)"
-                )
+                print(f"   ⚠️  {result2['new_count']} nouvelles séances ajoutées (inattendu)")
         else:
             print(f"   ❌ Échec : {result2.get('error', 'Erreur inconnue')}")
             return False
@@ -124,20 +110,14 @@ def test_single_file_logging():
         result3 = downloader3.scrape_seances()
 
         if result3["success"]:
-            print(
-                f"   ✅ Succès : {result3['total_count']} séances totales, {result3['new_count']} nouvelles"
-            )
+            print(f"   ✅ Succès : {result3['total_count']} séances totales, {result3['new_count']} nouvelles")
 
             # Vérifier que le nombre total est correct
-            expected_total = (
-                result1["total_count"] + 1
-            )  # +1 pour la séance ajoutée manuellement
+            expected_total = result1["total_count"] + 1  # +1 pour la séance ajoutée manuellement
             if result3["total_count"] == expected_total:
                 print(f"   ✅ Nombre total correct : {result3['total_count']}")
             else:
-                print(
-                    f"   ⚠️  Nombre total incorrect : attendu {expected_total}, obtenu {result3['total_count']}"
-                )
+                print(f"   ⚠️  Nombre total incorrect : attendu {expected_total}, obtenu {result3['total_count']}")
         else:
             print(f"   ❌ Échec : {result3.get('error', 'Erreur inconnue')}")
             return False

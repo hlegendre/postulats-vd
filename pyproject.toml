@@ -1,5 +1,5 @@
 [project]
-name = "telechargeur-postulats-vd"
+name = "postulats-dl"
 version = "1.0.0"
 description = "Application Python qui télécharge automatiquement les postulats du Conseil d'Etat du Canton de Vaud"
 authors = [{ name = "Hugues Le Gendre", email = "hugues@ikivox.org" }]
@@ -16,7 +16,7 @@ dependencies = [
 dev = ["pytest>=7.0.0", "black>=23.0.0", "flake8>=6.0.0"]
 
 [tool.black]
-line-length = 88
+line-length = 120
 target-version = ['py38']
 
 [tool.pytest.ini_options]
