@@ -10,7 +10,7 @@ MAX_SESSIONS = 1000  # Nombre maximum de sessions du CE à parcourir (sécurité
 # Date limite d'arrêt (format: 'YYYY-MM-DD')
 # Le script s'arrêtera quand il trouvera une séance antérieure à cette date
 # None = pas de limite (scrape toutes les pages)
-STOP_DATE = "2025-06-11"
+STOP_DATE = "2024-01-01"
 
 # Paramètres de requête
 REQUEST_TIMEOUT = 30  # secondes
