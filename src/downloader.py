@@ -9,35 +9,30 @@ Auteur: Hugues Le Gendre
 Date: 2024
 """
 
-import json
-import os
 import re
-import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 import time
 from config import (
-    MAX_PAGES,
+    MAX_SESSIONS,
     OUTPUT_FOLDER,
     PAGE_DELAY,
     REQUEST_TIMEOUT,
     STOP_DATE,
-    TARGET_URL,
     USER_AGENT,
-    VERBOSE,
 )
-import logging
+from .storage import Storage
+from .logging_utils import LoggingUtils
 
 
 class TelechargeurSeancesVD:
     def __init__(self, output_folder=OUTPUT_FOLDER):
         """
-        Initialise le téléchargeur de séances.
+        Initialise le téléchargeur de séances du Conseil d'État.
         
         Args:
             output_folder (str): Dossier pour sauvegarder les données extraites
@@ -49,34 +44,15 @@ class TelechargeurSeancesVD:
         })
         
         # Configuration de la journalisation
-        self.setup_logging()
+        self.logger = LoggingUtils.setup_simple_logger('ExtracteurSéances')
         
-        # Créer le dossier de sortie s'il n'existe pas
-        self.output_folder.mkdir(exist_ok=True)
-        
-        # Nom du fichier JSON unique pour toutes les séances
-        self.seances_file = self.output_folder / "seances_conseil_etat.json"
-        
-        # Charger les séances existantes
-        self.existing_seances = self.load_existing_seances()
+        # Initialiser le gestionnaire de stockage
+        self.storage = Storage(output_folder=output_folder)
         
         self.logger.info(f"Téléchargeur de séances initialisé avec le dossier de sortie : {self.output_folder}")
-        self.logger.info(f"Fichier de séances : {self.seances_file}")
-        self.logger.info(f"Séances existantes chargées : {len(self.existing_seances)}")
+        self.logger.info(f"Fichier de séances : {self.storage.get_file_path()}")
+        self.logger.info(f"Séances existantes chargées : {self.storage.get_seance_count()}")
     
-    def setup_logging(self):
-        """Configuration de la journalisation."""
-        self.logger = logging.getLogger('SeancesDownloader')
-        self.logger.setLevel(logging.INFO)
-        
-        # Créer le formateur
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        
-        # Gestionnaire console
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        self.logger.addHandler(console_handler)
-        
     def get_page_content(self, url):
         """
         Récupère le contenu d'une page web.
@@ -183,89 +159,6 @@ class TelechargeurSeancesVD:
                 raise ValueError(f"Mois non reconnu: {mois_nom}")
         else:
             raise ValueError(f"Format de date non reconnu: {date_str}")
-    
-    def load_existing_seances(self):
-        """
-        Charge les séances existantes depuis le fichier JSON.
-        
-        Returns:
-            dict: Dictionnaire des séances existantes avec l'URL comme clé
-        """
-        if not self.seances_file.exists():
-            self.logger.info("Aucun fichier de séances existant trouvé")
-            return {}
-        
-        try:
-            with open(self.seances_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                seances = data.get('seances', [])
-                
-                # Créer un dictionnaire avec l'URL comme clé pour un accès rapide
-                existing_seances = {}
-                for seance in seances:
-                    existing_seances[seance['url']] = seance
-                
-                self.logger.info(f"Chargement de {len(existing_seances)} séances existantes")
-                return existing_seances
-                
-        except (json.JSONDecodeError, FileNotFoundError) as e:
-            self.logger.warning(f"Erreur lors du chargement des séances existantes : {e}")
-            return {}
-    
-    def save_seances_to_json(self, seances):
-        """
-        Sauvegarde les informations des séances dans le fichier JSON unique.
-        
-        Args:
-            seances (list): Liste des informations des séances
-            
-        Returns:
-            str: Chemin du fichier sauvegardé
-        """
-        # Trier les séances par date
-        seances_sorted = sorted(seances, key=lambda x: x['date'], reverse=True)
-        
-        data = {
-            'metadonnees': {
-                'url_source': TARGET_URL,
-                'derniere_mise_a_jour': datetime.now().isoformat(),
-                'total_seances': len(seances_sorted)
-            },
-            'seances': seances_sorted
-        }
-        
-        with open(self.seances_file, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        
-        self.logger.info(f"Données sauvegardées dans : {self.seances_file}")
-        return str(self.seances_file)
-    
-    def merge_new_seances(self, seances, current_date):
-        """
-        Fusionne les nouvelles séances avec les existantes.
-        
-        Args:
-            seances (list): Liste des nouvelles séances trouvées
-            current_date (str): Date de découverte pour cette session
-            
-        Returns:
-            list: Liste complète des séances (existantes + nouvelles)
-        """
-        merged_seances = list(self.existing_seances.values())
-        new_count = 0
-        
-        for seance in seances:
-            if seance['url'] not in self.existing_seances:
-                # Ajouter la date de découverte
-                seance['date_decouverte'] = current_date
-                merged_seances.append(seance)
-                new_count += 1
-                self.logger.info(f"Nouvelle séance trouvée : {seance['date']} - {seance['titre']}")
-            else:
-                self.logger.debug(f"Séance déjà connue ignorée : {seance['date']} - {seance['titre']}")
-        
-        self.logger.info(f"Fusion terminée : {new_count} nouvelles séances ajoutées")
-        return merged_seances
 
     def extract_pagination_links(self, html_content, base_url):
         """
@@ -338,7 +231,7 @@ class TelechargeurSeancesVD:
             self.logger.warning(f"Erreur lors de la comparaison des dates : {e}")
             return False
 
-    def scrape_seances(self, target_url=None):
+    def scrape_seances(self, target_url="https://www.vd.ch/actualites/decisions-du-conseil-detat"):
         """
         Méthode principale pour extraire les séances du Conseil d'État avec pagination.
         
@@ -348,9 +241,6 @@ class TelechargeurSeancesVD:
         Returns:
             dict: Résumé de l'extraction
         """
-        if target_url is None:
-            target_url = TARGET_URL
-            
         self.logger.info(f"Début de l'extraction des séances depuis : {target_url}")
         
         # Définir la date de découverte une seule fois pour toute la session
@@ -360,15 +250,14 @@ class TelechargeurSeancesVD:
         # Détection automatique de l'URL de base depuis l'URL cible
         parsed_url = urlparse(target_url)
         base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-        self.logger.info(f"URL de base détectée : {base_url}")
         
-        all_seances = []
+        new_seances_count = 0
         pages_processed = 0
         stop_reached = False
         current_url = target_url
         visited_urls = set()  # Pour éviter les boucles infinies
         
-        while current_url and pages_processed < MAX_PAGES and not stop_reached:
+        while current_url and pages_processed < MAX_SESSIONS and not stop_reached:
             # Vérifier si l'URL a déjà été visitée
             if current_url in visited_urls:
                 self.logger.warning(f"URL déjà visitée, arrêt pour éviter la boucle infinie : {current_url}")
@@ -376,7 +265,7 @@ class TelechargeurSeancesVD:
                 
             visited_urls.add(current_url)
             pages_processed += 1  # Incrémenter le compteur au début du traitement de chaque page
-            self.logger.info(f"Traitement de la page {pages_processed} : {current_url}")
+            self.logger.debug(f"Traitement de la page {pages_processed} : {current_url}")
             
             # Récupérer le contenu de la page
             html_content = self.get_page_content(current_url)
@@ -393,23 +282,19 @@ class TelechargeurSeancesVD:
             
             self.logger.info(f"Nombre de séances trouvées sur la page {pages_processed} : {len(page_seances)}")
             
-            # Vérifier si on doit s'arrêter basé sur la date
-            page_seances_to_add = []
+            # Traiter chaque séance de la page
+            page_new_seances = 0
             for seance in page_seances:
+                # Vérifier si on doit s'arrêter basé sur la date
                 if self.should_stop_scraping(seance['date']):
                     self.logger.info(f"Date limite atteinte ({STOP_DATE}). Séance trouvée : {seance['date']}")
                     stop_reached = True
                     break
-                page_seances_to_add.append(seance)
-            
-            # Ajouter les séances de cette page à la liste totale
-            all_seances.extend(page_seances_to_add)
-            
-            # Sauvegarder le fichier JSON après chaque page
-            if page_seances_to_add:
-                merged_seances = self.merge_new_seances(all_seances, current_date)
-                self.save_seances_to_json(merged_seances)
-                self.logger.info(f"Fichier JSON sauvegardé après la page {pages_processed} ({len(merged_seances)} séances total)")
+                
+                # Ajouter la séance au stockage
+                if self.storage.seance_ajoute(seance, current_date):
+                    page_new_seances += 1
+                    new_seances_count += 1
             
             if stop_reached:
                 break
@@ -428,67 +313,15 @@ class TelechargeurSeancesVD:
                 self.logger.info("Aucun lien de pagination trouvé, fin du scraping")
                 break
         
-        if not all_seances:
-            self.logger.warning("Aucune séance trouvée sur toutes les pages")
-            return {'success': True, 'seances': [], 'message': 'Aucune séance trouvée'}
+        stored_seances = self.storage.get_seance_count()
         
-        self.logger.info(f"Total des séances trouvées sur {pages_processed} pages : {len(all_seances)}")
-        
-        # Fusionner avec les séances existantes (final)
-        merged_seances = self.merge_new_seances(all_seances, current_date)
-        
-        # Sauvegarder dans le fichier JSON (final)
-        json_file = self.save_seances_to_json(merged_seances)
+        self.logger.info(f"Nombre de nouvelles séances trouvées sur {pages_processed} pages : {new_seances_count}")
+        self.logger.info(f"Nombre total de séances stockées : {stored_seances}")
         
         return {
             'success': True,
-            'seances': merged_seances,  # Ensemble de toutes les séances (existantes + nouvelles)
-            'new_seances': [s for s in all_seances if s['url'] not in self.existing_seances],  # Seulement les nouvelles
-            'json_file': json_file,
-            'total_count': len(merged_seances),
-            'new_count': len([s for s in all_seances if s['url'] not in self.existing_seances]),
             'pages_processed': pages_processed,
+            'new_seances_count': new_seances_count,
+            'stored_seances': stored_seances,
             'stop_reached': stop_reached
         }
-
-
-def main():
-    """Fonction principale."""
-    downloader = TelechargeurSeancesVD()
-    
-    print("=== Téléchargeur de Séances du Conseil d'État VD ===")
-    print(f"URL cible : {TARGET_URL}")
-    print(f"Dossier de sortie : {OUTPUT_FOLDER}")
-    print(f"Fichier de séances : {downloader.seances_file}")
-    print(f"Date limite d'arrêt : {STOP_DATE if STOP_DATE else 'Aucune'}")
-    print(f"Nombre maximum de pages : {MAX_PAGES}")
-    print(f"Délai entre les pages : {PAGE_DELAY} seconde(s)")
-    print()
-    
-    result = downloader.scrape_seances()
-    
-    if result['success']:
-        print(f"✅ Extraction réussie !")
-        print(f"📊 Total des séances : {result['total_count']}")
-        print(f"🆕 Nouvelles séances ajoutées : {result['new_count']}")
-        print(f"📄 Pages traitées : {result['pages_processed']}")
-        print(f"📁 Fichier JSON : {result['json_file']}")
-        
-        if result.get('stop_reached'):
-            print(f"🛑 Arrêt anticipé : date limite ({STOP_DATE}) atteinte")
-        
-        if result['new_seances']:
-            print("\n🆕 Nouvelles séances ajoutées :")
-            for i, seance in enumerate(result['new_seances'][:5]):
-                print(f"  {i+1}. {seance['date']} - {seance['titre']}")
-            
-            if len(result['new_seances']) > 5:
-                print(f"  ... et {len(result['new_seances']) - 5} autres")
-        else:
-            print(f"\nℹ️  Aucune nouvelle séance ajoutée")
-    else:
-        print(f"❌ Échec de l'extraction : {result.get('error', 'Erreur inconnue')}")
-
-
-if __name__ == "__main__":
-    main() 

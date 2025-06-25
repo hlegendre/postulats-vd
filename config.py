@@ -4,7 +4,7 @@ Fichier de configuration pour le "Téléchargeur de séances du Conseil d'État 
 
 # Base configuration
 TARGET_URL = "https://www.vd.ch/actualites/decisions-du-conseil-detat"
-OUTPUT_FOLDER = "seances"
+OUTPUT_FOLDER = "output"
 
 # Request settings
 REQUEST_TIMEOUT = 30   # seconds
@@ -16,7 +16,7 @@ USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
 VERBOSE = True
 
 # Pagination settings
-MAX_PAGES = 50  # Nombre maximum de pages à parcourir (sécurité)
+MAX_SESSIONS = 1000  # Nombre maximum de sessions du Conseil d'État à parcourir (sécurité)
 PAGE_DELAY = 1  # Délai en secondes entre les requêtes de pages
 
 # Date limite d'arrêt (format: 'YYYY-MM-DD')

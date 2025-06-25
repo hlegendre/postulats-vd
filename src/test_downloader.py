@@ -10,15 +10,8 @@ import json
 import tempfile
 from pathlib import Path
 from datetime import datetime
-from downloader import TelechargeurSeancesVD
+from .downloader import TelechargeurSeancesVD
 
-# Import de la configuration
-try:
-    from config import OUTPUT_FOLDER
-except ImportError:
-    print("❌ Erreur: Impossible d'importer le fichier de configuration 'config.py'")
-    print("   Assurez-vous que le fichier config.py existe dans le répertoire courant.")
-    exit(1)
 
 def test_single_file_logging():
     """Test du nouveau système de logging avec un seul fichier JSON."""
