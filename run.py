@@ -9,10 +9,11 @@ from src.downloader import TelechargeurSeancesVD
 import logging
 from src.logging_utils import LoggingUtils
 
+
 def main():
     """Fonction principale."""
     downloader = TelechargeurSeancesVD()
-    
+
     print("=== Téléchargeur de Séances du Conseil d'État VD ===")
     print(f"Dossier de sortie : {OUTPUT_FOLDER}")
     print(f"Fichier de stockage : {downloader.storage.get_file_path()}")
@@ -23,20 +24,22 @@ def main():
 
     if VERBOSE:
         logging.basicConfig(level=logging.DEBUG)
-    
+
     result = downloader.scrape_seances()
-    
-    if result['success']:
+
+    if result["success"]:
         print(f"✅ Extraction réussie !")
         print(f"📊 Total des séances stockées : {result['stored_seances']}")
         print(f"🆕 Nouvelles séances ajoutées : {result['new_seances_count']}")
         print(f"📄 Pages traitées : {result['pages_processed']}")
-        
-        if result.get('stop_reached'):
+
+        if result.get("stop_reached"):
             print(f"🛑 Arrêt anticipé : date limite ({STOP_DATE}) atteinte")
-        
-        if result['new_seances_count'] > 0:
-            print(f"\nℹ️  {result['new_seances_count']} nouvelles séances ont été ajoutées au stockage")
+
+        if result["new_seances_count"] > 0:
+            print(
+                f"\nℹ️  {result['new_seances_count']} nouvelles séances ont été ajoutées au stockage"
+            )
         else:
             print(f"\nℹ️  Aucune nouvelle séance ajoutée")
     else:
@@ -44,4 +47,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()
