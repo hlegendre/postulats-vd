@@ -10,7 +10,7 @@ import json
 import tempfile
 from pathlib import Path
 from datetime import datetime
-from postulats_vd.core.downloader import TelechargeurSeancesVD
+from postulats_vd.core.sessionfinder import CESessionFinder
 
 
 def test_single_file_logging():
@@ -26,7 +26,7 @@ def test_single_file_logging():
 
         # Premier lancement - devrait créer le fichier et ajouter toutes les séances
         print("1. Premier lancement...")
-        downloader1 = TelechargeurSeancesVD(output_folder=str(temp_path))
+        downloader1 = CESessionFinder(output_folder=str(temp_path))
         result1 = downloader1.scrape_seances()
 
         assert result1["success"], f"Échec du premier lancement : {result1.get('error', 'Erreur inconnue')}"
@@ -57,7 +57,7 @@ def test_single_file_logging():
 
         # Deuxième lancement - devrait ignorer les séances existantes
         print("2. Deuxième lancement (même données)...")
-        downloader2 = TelechargeurSeancesVD(output_folder=str(temp_path))
+        downloader2 = CESessionFinder(output_folder=str(temp_path))
         result2 = downloader2.scrape_seances()
 
         assert result2["success"], f"Échec du deuxième lancement : {result2.get('error', 'Erreur inconnue')}"
@@ -100,7 +100,7 @@ def test_single_file_logging():
 
         # Troisième lancement - devrait détecter la nouvelle séance
         print("4. Troisième lancement (après ajout manuel)...")
-        downloader3 = TelechargeurSeancesVD(output_folder=str(temp_path))
+        downloader3 = CESessionFinder(output_folder=str(temp_path))
         result3 = downloader3.scrape_seances()
 
         assert result3["success"], f"Échec du troisième lancement : {result3.get('error', 'Erreur inconnue')}"

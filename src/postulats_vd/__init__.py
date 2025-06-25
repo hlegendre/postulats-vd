@@ -9,7 +9,7 @@ __version__ = "1.0.0"
 __author__ = "Hugues Le Gendre"
 __email__ = "hugues@ikivox.org"
 
-from .core.downloader import TelechargeurSeancesVD
+from .core.sessionfinder import CESessionFinder
 from .core.storage import Storage
 
-__all__ = ["TelechargeurSeancesVD", "Storage"]
+__all__ = ["CESessionFinder", "Storage"]

@@ -14,6 +14,7 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
+from typing import TypedDict
 import requests
 from bs4 import BeautifulSoup
 import time
@@ -29,10 +30,18 @@ from .storage import Storage
 from ..utils.logging import LoggingUtils
 
 
-class TelechargeurSeancesVD:
+class CESessionFinderResult(TypedDict):
+    success: bool
+    pages_processed: int
+    new_seances_count: int
+    stored_seances: int
+    stop_reached: bool
+
+
+class CESessionFinder:
     def __init__(self, output_folder=OUTPUT_FOLDER):
         """
-        Initialise le téléchargeur de séances du Conseil d'État.
+        Initialise le découvreur de séances du Conseil d'État.
 
         Args:
             output_folder (str): Dossier pour sauvegarder les données extraites
@@ -47,7 +56,7 @@ class TelechargeurSeancesVD:
         # Initialiser le gestionnaire de stockage
         self.storage = Storage(output_folder=output_folder)
 
-        self.logger.info(f"Téléchargeur de séances initialisé avec le dossier de sortie : {self.output_folder}")
+        self.logger.info(f"Découvreur de séances initialisé avec le dossier de sortie : {self.output_folder}")
         self.logger.info(f"Fichier de séances : {self.storage.get_file_path()}")
         self.logger.info(f"Séances existantes chargées : {self.storage.get_seance_count()}")
 
@@ -238,7 +247,9 @@ class TelechargeurSeancesVD:
             self.logger.warning(f"Erreur lors de la comparaison des dates : {e}")
             return False
 
-    def scrape_seances(self, target_url="https://www.vd.ch/actualites/decisions-du-conseil-detat"):
+    def scrape_seances(
+        self, target_url="https://www.vd.ch/actualites/decisions-du-conseil-detat"
+    ) -> CESessionFinderResult:
         """
         Méthode principale pour extraire les séances du Conseil d'État avec pagination.
 
