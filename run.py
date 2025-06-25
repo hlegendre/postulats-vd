@@ -4,7 +4,7 @@ from src.postulats_vd.config import (
     OUTPUT_FOLDER,
     STOP_DATE,
 )
-from src.postulats_vd.core.sessionfinder import CESessionFinder
+from src.postulats_vd.core import SessionLister, SessionExtractor, Storage
 
 
 def parse_arguments():
@@ -39,14 +39,15 @@ def main():
     """Fonction principale."""
     args = parse_arguments()
     setup_logging(args.verbose)
+    storage = Storage()
 
     logging.debug(f"Dossier de sortie : {OUTPUT_FOLDER}")
     logging.info(f"Date limite d'arrêt : {STOP_DATE if STOP_DATE else 'Aucune'}")
 
     # Découverte des séances
     print("=== Découverte des Séances du Conseil d'État VD ===")
-    sessionFinder = CESessionFinder()
-    result = sessionFinder.scrape_seances()
+    sessionFinder = SessionLister(storage=storage)
+    result = sessionFinder.list()
     if result["success"]:
         if result["stop_reached"]:
             print(f"> arrêt anticipé : date limite ({STOP_DATE}) atteinte)")
@@ -60,6 +61,12 @@ def main():
 
     # Récupération des séances
     print("=== Récupération des Séances du Conseil d'État VD ===")
+    sessionExtractor = SessionExtractor(storage=storage)
+    result = sessionExtractor.extract_all_seances()
+    status = "✅ OK" if result["success"] else "❌ KO"
+    print(
+        f"{status} : nouvelles = {result['nb_extracted']} / ignorées = {result['nb_ignored']} / en erreur = {result['nb_error']}"
+    )
 
 
 if __name__ == "__main__":

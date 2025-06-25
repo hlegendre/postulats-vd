@@ -9,7 +9,7 @@ __version__ = "1.0.0"
 __author__ = "Hugues Le Gendre"
 __email__ = "hugues@ikivox.org"
 
-from .core.sessionfinder import CESessionFinder
+from .core.session_lister import SessionLister
 from .core.storage import Storage
 
-__all__ = ["CESessionFinder", "Storage"]
+__all__ = ["SessionLister", "Storage"]

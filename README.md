@@ -1,35 +1,51 @@
 # Téléchargeur de Séances du Conseil d'État VD
 
-Ce script permet d'extraire automatiquement les informations des séances du Conseil d'État du canton de Vaud depuis le site officiel.
+Ce script permet d'extraire automatiquement les informations détaillées des séances du Conseil d'État du canton de Vaud depuis le site officiel.
 
 ## Fonctionnalités
 
-- **Extraction automatique** : Récupère les URLs et dates des séances depuis le site officiel
+- **Extraction automatique** : Récupère les URLs, dates, titres et contenus détaillés des séances depuis le site officiel
 - **Système de logging unifié** : Un seul fichier JSON récapitule toutes les séances
 - **Détection des nouvelles séances** : Ignore automatiquement les séances déjà connues
 - **Métadonnées de découverte** : Chaque séance inclut sa date de première découverte
 - **Parsing des dates françaises** : Conversion automatique des dates françaises en format ISO
 - **Pagination automatique** : Parcourt automatiquement toutes les pages disponibles
 - **Arrêt conditionnel** : Possibilité de s'arrêter à une date limite configurée
+- **Extraction des parties et fichiers** : Pour chaque séance, toutes les parties et fichiers associés sont extraits
 
 ## Structure du fichier JSON
 
-Le script génère un fichier unique `seances_conseil_etat.json` avec la structure suivante :
+Le script génère un fichier unique `output/storage.json` avec la structure suivante :
 
 ```json
 {
   "metadonnees": {
     "url_source": "https://www.vd.ch/actualites/decisions-du-conseil-detat",
-    "derniere_mise_a_jour": "2025-06-24T18:04:18.487168",
-    "total_seances": 45
+    "derniere_mise_a_jour": "2025-06-25T15:52:30.031871",
+    "total_seances": 2
   },
   "seances": [
     {
       "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029290",
       "date": "2025-06-18",
-      "date_originale": "18 juin 2025",
+      "date_originale": "2025-06-18",
+      "date_decouverte": "2025-06-25T15:52:17.868910",
       "titre": "Séance du Conseil d'Etat du 18 juin 2025",
-      "date_decouverte": "2025-06-24T17:41:52.624964"
+      "parties": [
+        {
+          "titre": "Un nouveau bâtiment pour la Haute école pédagogique à Chavannes-près-Renens",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2310752",
+              "nom": "EMPD accordant au Conseil d'État un crédit d'investissement..."
+            }
+          ]
+        },
+        {
+          "titre": "Crédit d'études pour le remplacement du Dossier patient informatisé",
+          "fichiers": []
+        }
+      ]
     }
   ]
 }
@@ -39,9 +55,20 @@ Le script génère un fichier unique `seances_conseil_etat.json` avec la structu
 
 - `url` : URL complète de la page de la séance
 - `date` : Date au format ISO (YYYY-MM-DD)
-- `date_originale` : Date originale en français
-- `titre` : Titre de la séance
+- `date_originale` : Date originale (format source)
 - `date_decouverte` : Date et heure de première découverte de cette séance
+- `titre` : Titre de la séance
+- `parties` : Liste des parties de la séance
+
+### Champs des parties
+
+- `titre` : Titre de la partie
+- `fichiers` : Liste des fichiers associés à cette partie
+
+### Champs des fichiers
+
+- `url` : URL du fichier
+- `nom` : Nom ou description du fichier
 
 ## Utilisation
 
@@ -89,27 +116,18 @@ Le script affiche :
 - Le nombre total de séances dans la base
 - Le nombre de nouvelles séances trouvées
 - Le chemin du fichier JSON
-- La liste des nouvelles séances (si applicable)
+- Un résumé des nouvelles séances extraites
 
 Exemple :
 
 ```
-=== Téléchargeur de Séances du Conseil d'État VD ===
-URL cible : https://www.vd.ch/actualites/decisions-du-conseil-detat
-Dossier de sortie : seances
-Fichier de séances : seances/seances_conseil_etat.json
-Date limite d'arrêt : 2024-05-14
-Nombre maximum de pages : 50
-Délai entre les pages : 1 seconde(s)
-
-✅ Extraction réussie !
-📊 Total des séances : 45
-🆕 Nouvelles séances ajoutées : 0
-📄 Pages traitées : 3
-📁 Fichier JSON : seances/seances_conseil_etat.json
-
-ℹ️  Aucune nouvelle séance ajoutée
+=== Découverte des Séances du Conseil d'État VD ===
+✅ OK : nouvelles = 2 / totales = 10 (pages = 1)
+=== Récupération des Séances du Conseil d'État VD ===
+✅ OK : nouvelles = 2 / ignorées = 8 / en erreur = 0
 ```
+
+Le fichier de sortie est : `output/storage.json`
 
 ## Qualité du Code
 
@@ -179,9 +197,10 @@ git commit --no-verify -m "message d'urgence"
 
 ### Premier lancement
 
-- Crée le fichier `seances_conseil_etat.json`
+- Crée le fichier `output/storage.json`
 - Extrait toutes les séances disponibles depuis toutes les pages
 - Ajoute la métadonnée `date_decouverte` à chaque séance
+- Extrait toutes les parties et fichiers associés à chaque séance
 
 ### Lancements suivants
 
@@ -189,9 +208,9 @@ git commit --no-verify -m "message d'urgence"
 - Extrait les séances depuis le site web (avec pagination)
 - Compare les URLs pour identifier les nouvelles séances
 - Ajoute uniquement les nouvelles séances avec leur `date_decouverte`
-- Met à jour le fichier JSON avec toutes les séances
+- Met à jour le fichier JSON avec toutes les séances et leur contenu détaillé
 
-### Avantages du nouveau système
+### Avantages du système
 
 1. **Pas de duplication** : Un seul fichier contient toutes les séances
 2. **Traçabilité** : Chaque séance garde sa date de première découverte
@@ -199,6 +218,7 @@ git commit --no-verify -m "message d'urgence"
 4. **Historique** : Conservation de l'historique complet des découvertes
 5. **Pagination automatique** : Parcourt toutes les pages sans intervention
 6. **Arrêt intelligent** : S'arrête automatiquement à la date limite configurée
+7. **Extraction complète** : Toutes les parties et fichiers sont extraits pour chaque séance
 
 ## Tests
 
@@ -214,12 +234,13 @@ Les tests vérifient :
 - L'ignorance des séances déjà connues
 - La détection des nouvelles séances
 - La conservation des métadonnées de découverte
+- L'extraction correcte des parties et fichiers
 
 ## Configuration
 
-Le script utilise le fichier `config.py` pour sa configuration :
+Le script utilise le fichier `settings.py` pour sa configuration :
 
-- `OUTPUT_FOLDER` : Dossier de sortie pour les fichiers JSON
+- `OUTPUT_FOLDER` : Dossier de sortie pour les fichiers JSON (par défaut `output`)
 - `MAX_SESSIONS` : Nombre maximum de pages à parcourir
 - `STOP_DATE` : Date limite d'arrêt (format YYYY-MM-DD)
 - `REQUEST_TIMEOUT` : Timeout des requêtes HTTP

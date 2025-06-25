@@ -6,6 +6,7 @@ This module contains all configuration settings and constants used throughout th
 
 from .settings import (
     OUTPUT_FOLDER,
+    STORAGE_FILENAME,
     MAX_SESSIONS,
     STOP_DATE,
     REQUEST_TIMEOUT,
@@ -15,6 +16,7 @@ from .settings import (
 
 __all__ = [
     "OUTPUT_FOLDER",
+    "STORAGE_FILENAME",
     "MAX_SESSIONS",
     "STOP_DATE",
     "REQUEST_TIMEOUT",

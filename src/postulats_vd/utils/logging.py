@@ -12,6 +12,8 @@ Date: 2024
 import logging
 from typing import Optional
 
+Logger = logging.Logger
+
 
 class LoggingUtils:
     """
@@ -32,7 +34,7 @@ class LoggingUtils:
         return logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     @staticmethod
-    def setup_logger(name: str, formatter: Optional[logging.Formatter] = get_default_formatter()) -> logging.Logger:
+    def setup_logger(name: str, formatter: Optional[logging.Formatter] = get_default_formatter()) -> Logger:
         """
         Configure et retourne un logger avec les paramètres spécifiés.
 
@@ -65,7 +67,7 @@ class LoggingUtils:
         return logger
 
     @staticmethod
-    def setup_simple_logger(name: str) -> logging.Logger:
+    def setup_simple_logger(name: str) -> Logger:
         """
         Configure un logger simple avec le formateur par défaut.
 

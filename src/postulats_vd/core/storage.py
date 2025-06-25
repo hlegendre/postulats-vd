@@ -13,7 +13,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any, TypedDict
-from ..utils.logging import LoggingUtils
+from ..config import OUTPUT_FOLDER, STORAGE_FILENAME
+from ..utils.logging import LoggingUtils, Logger
 
 
 class SeanceFichier(TypedDict):
@@ -33,7 +34,7 @@ class SeanceFichier(TypedDict):
 
 class SeancePartie(TypedDict):
     titre: str
-    fichier: list[SeanceFichier]
+    fichiers: list[SeanceFichier]
 
     @staticmethod
     def check_type(data: Any) -> bool:
@@ -41,9 +42,9 @@ class SeancePartie(TypedDict):
             isinstance(data, dict)
             and "titre" in data
             and isinstance(data["titre"], str)
-            and "fichier" in data
-            and isinstance(data["fichier"], list)
-            and all(SeanceFichier.check_type(fichier) for fichier in data["fichier"])
+            and "fichiers" in data
+            and isinstance(data["fichiers"], list)
+            and all(SeanceFichier.check_type(fichier) for fichier in data["fichiers"])
         )
 
 
@@ -53,7 +54,7 @@ class Seance(TypedDict):
     date_decouverte: str
     date_originale: str
     titre: str
-    parties: Optional[list[SeancePartie]]
+    parties: list[SeancePartie]
 
     @staticmethod
     def check_type(data: Any) -> bool:
@@ -121,13 +122,19 @@ class Storage:
     Gestionnaire de stockage des données du projet.
 
     Cette classe fournit une interface claire pour :
-    - Vérifier si une séance existe
-    - Ajouter une nouvelle séance
+    - Vérifier si une séance a déjà été découverte
+    - Ajouter ou mettre à jour une séance
 
     La classe sauvegarde automatiquement les données dans un fichier JSON.
     """
 
-    def __init__(self, output_folder: str = "output", filename: str = "storage.json"):
+    output_folder: Path
+    filename: str
+    storage_file: Path
+    logger: Logger
+    _seances_cache: Dict[str, Seance]
+
+    def __init__(self, output_folder: str = OUTPUT_FOLDER, filename: str = STORAGE_FILENAME):
         """
         Initialise le gestionnaire de stockage.
 
@@ -168,44 +175,8 @@ class Storage:
                 return {seance["date"]: seance for seance in data["seances"]}
 
         except (ValueError, json.JSONDecodeError, FileNotFoundError) as e:
-            self.logger.warning(f"Erreur lors du chargement des séances existantes : {e}")
+            self.logger.warning(f"Erreur lors du chargement de la base de données : {e}")
             return {}
-
-    def seance_existe(self, date: str) -> bool:
-        """
-        Vérifie si une séance existe déjà.
-
-        Args:
-            date (str): Date de la séance à vérifier (format: "YYYY-MM-DD")
-
-        Returns:
-            bool: True si la séance existe, False sinon
-        """
-        return date in self._seances_cache
-
-    def seance_ajoute(self, seance: Seance) -> bool:
-        """
-        Ajoute une nouvelle séance si elle n'existe pas déjà.
-
-        Args:
-            details (dict): Détails de la séance (url, date, titre, etc.)
-            date_decouverte (str): Date de découverte de la séance
-
-        Returns:
-            bool: True si la séance a été ajoutée, False si elle existait déjà
-        """
-        if self.seance_existe(seance["date"]):
-            self.logger.debug(f"Séance déjà existante ignorée : {seance['date']}")
-            return False
-
-        # Ajouter au cache
-        self._seances_cache[seance["date"]] = seance
-
-        # Sauvegarder immédiatement
-        self._save_to_file()
-
-        self.logger.debug(f"Nouvelle séance sauvegardée : {seance['date']} - {seance['titre']}")
-        return True
 
     def _save_to_file(self):
         """
@@ -226,14 +197,46 @@ class Storage:
         try:
             with open(self.storage_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
-
-            self.logger.debug(f"Fichier sauvegardé : {self.storage_file} ({len(seances_sorted)} séances)")
+            self.logger.debug(f"Base de données sauvegardée : {self.storage_file} ({len(seances_sorted)} éléments)")
 
         except Exception as e:
-            self.logger.error(f"Erreur lors de la sauvegarde : {e}")
+            self.logger.error(f"Erreur lors de la sauvegarde de la base de données : {e}")
             raise
 
-    def get_all_seances(self) -> List[Dict[str, Any]]:
+    def seance_exists(self, date: str) -> bool:
+        """
+        Vérifie si une séance existe déjà
+
+        Args:
+            date (str): Date de la séance à vérifier (format: "YYYY-MM-DD")
+
+        Returns:
+            bool: True si la séance existe, False sinon
+        """
+        return date in self._seances_cache
+
+    def seance_upsert(self, seance: Seance) -> bool:
+        """
+        Ajoute une nouvelle séance ou met à jour une séance existante.
+
+        Args:
+            seance (Seance): La séance à ajouter ou mettre à jour
+
+        Returns:
+            bool: True si la séance a été ajoutée, False si elle a été modifiée
+        """
+        exists = self.seance_exists(seance["date"])
+        self._seances_cache[seance["date"]] = seance
+        self._save_to_file()
+
+        if exists:
+            self.logger.debug(f"Séance modifiée : {seance['date']} - {seance['titre']}")
+            return False
+        else:
+            self.logger.debug(f"Séance créée : {seance['date']} - {seance['titre']}")
+            return True
+
+    def seances_get(self) -> List[Seance]:
         """
         Récupère toutes les séances stockées.
 
@@ -242,7 +245,7 @@ class Storage:
         """
         return list(self._seances_cache.values())
 
-    def get_seance_count(self) -> int:
+    def seances_count(self) -> int:
         """
         Retourne le nombre total de séances stockées.
 

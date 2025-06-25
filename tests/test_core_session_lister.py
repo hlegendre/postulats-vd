@@ -10,7 +10,8 @@ import json
 import tempfile
 from pathlib import Path
 from datetime import datetime
-from postulats_vd.core.sessionfinder import CESessionFinder
+from postulats_vd.core.session_lister import SessionLister
+from postulats_vd.core.storage import Storage
 
 
 def test_single_file_logging():
@@ -19,6 +20,7 @@ def test_single_file_logging():
     # Créer un dossier temporaire pour les tests
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
+        storage = Storage(output_folder=str(temp_path))
 
         print("=== Test du système de logging avec un seul fichier JSON ===")
         print(f"Dossier temporaire : {temp_path}")
@@ -26,8 +28,8 @@ def test_single_file_logging():
 
         # Premier lancement - devrait créer le fichier et ajouter toutes les séances
         print("1. Premier lancement...")
-        downloader1 = CESessionFinder(output_folder=str(temp_path))
-        result1 = downloader1.scrape_seances()
+        downloader1 = SessionLister(storage)
+        result1 = downloader1.list()
 
         assert result1["success"], f"Échec du premier lancement : {result1.get('error', 'Erreur inconnue')}"
         print(f"   ✅ Succès : {result1['stored_seances']} séances totales, {result1['new_seances_count']} nouvelles")
@@ -57,8 +59,8 @@ def test_single_file_logging():
 
         # Deuxième lancement - devrait ignorer les séances existantes
         print("2. Deuxième lancement (même données)...")
-        downloader2 = CESessionFinder(output_folder=str(temp_path))
-        result2 = downloader2.scrape_seances()
+        downloader2 = SessionLister(storage)
+        result2 = downloader2.list()
 
         assert result2["success"], f"Échec du deuxième lancement : {result2.get('error', 'Erreur inconnue')}"
         assert result2["stored_seances"] == result1["stored_seances"], "Le nombre de séances stockées doit être le même"
@@ -82,9 +84,10 @@ def test_single_file_logging():
         new_seance = {
             "url": "https://www.vd.ch/test/nouvelle-seance",
             "date": "2025-06-25",
-            "date_originale": "25 juin 2025",
+            "date_originale": "2025-06-25",
             "titre": "Séance du Conseil d'Etat du 25 juin 2025",
             "date_decouverte": datetime.now().isoformat(),
+            "parties": [],
         }
         seances.append(new_seance)
 
@@ -98,10 +101,13 @@ def test_single_file_logging():
 
         print(f"   📝 Nouvelle séance ajoutée manuellement")
 
+        print()
+
         # Troisième lancement - devrait détecter la nouvelle séance
         print("4. Troisième lancement (après ajout manuel)...")
-        downloader3 = CESessionFinder(output_folder=str(temp_path))
-        result3 = downloader3.scrape_seances()
+        storage = Storage(output_folder=str(temp_path))
+        downloader3 = SessionLister(storage)
+        result3 = downloader3.list()
 
         assert result3["success"], f"Échec du troisième lancement : {result3.get('error', 'Erreur inconnue')}"
         assert (

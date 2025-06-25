@@ -1,393 +1,180 @@
 {
   "metadonnees": {
     "url_source": "https://www.vd.ch/actualites/decisions-du-conseil-detat",
-    "derniere_mise_a_jour": "2025-06-25T12:35:35.193233",
-    "total_seances": 48
+    "derniere_mise_a_jour": "2025-06-25T15:52:30.031871",
+    "total_seances": 2
   },
   "seances": [
     {
       "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029290",
       "date": "2025-06-18",
-      "date_originale": "18 juin 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
+      "date_originale": "2025-06-18",
+      "date_decouverte": "2025-06-25T15:52:17.868910",
       "titre": "Séance du Conseil d'Etat du 18 juin 2025",
-      "parties": []
+      "parties": [
+        {
+          "titre": "Un nouveau bâtiment pour la Haute école pédagogique à Chavannes-près-Renens",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2310752",
+              "nom": "EMPD accordant au Conseil d'État un crédit d’investissement de CHF 62’860'000.- pour financer la construction d’un nouveau bâtiment pour la Haute école pédagogique aux Côtes de la Bourdonnette à Chavannes-près-Renens - Texte adopté par CE - EMPD Cr.Inv. CHF 62'860'000 nouveau bâtiment HEP Côtes de la Bourdonnette - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Crédit d’études pour le remplacement du Dossier patient informatisé",
+          "fichiers": []
+        },
+        {
+          "titre": "Crédit d'étude pour le remplacement de la solution informatique d'élaboration du budget de l'Etat",
+          "fichiers": []
+        },
+        {
+          "titre": "Achat et mise en conformité d’un atelier socioéducatif à Rossinière",
+          "fichiers": []
+        },
+        {
+          "titre": "Taxation progressive et solidaire de l'eau",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2311079",
+              "nom": "Réponse du Conseil d'Etat au Grand Conseil à l'interpellation Yannick Maury et consorts - Une tarification progressive et solidaire de l’eau pour le Canton de Vaud ? (24_INT_150) - Texte adopté par CE - R-CE INT Maury 24_INT_150 - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Précisions sur la Prestation d’intérêt général implicite du CHUV",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2311088",
+              "nom": "Réponse du Conseil d'Etat au Grand Conseil à la simple question Fabrice Moscheni - Question: Comprendre un peu plus les PIG implicites (25_QUE_39) - Texte adopté par CE - R-CE QUE Moscheni 25_QUE_39 - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Le Conseil d'Etat œuvre à protéger les droits populaires",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2309395",
+              "nom": "Réponse du Conseil d'Etat au Grand Conseil à l'interpellation Alberto Mocchi et consorts - Nos signatures ne sont pas à vendre ! (24_INT_125) - Texte adopté par CE - R-CE INT Mocchi 24_INT_125 - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Consultation fédérale : modification de la loi sur la géoinformation",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2311112",
+              "nom": "Consultation fédérale (CE) Modification de la loi sur la géoinformation– Cadastre des restrictions de droit public à la propriété foncière - Lettre du Conseil d'Etat publiée"
+            }
+          ]
+        }
+      ]
     },
     {
       "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029289",
       "date": "2025-06-11",
-      "date_originale": "11 juin 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
+      "date_originale": "2025-06-11",
+      "date_decouverte": "2025-06-25T15:52:17.868910",
       "titre": "Séance du Conseil d'Etat du 11 juin 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029288",
-      "date": "2025-06-04",
-      "date_originale": "4 juin 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 4 juin 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029285",
-      "date": "2025-05-28",
-      "date_originale": "28 mai 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 28 mai 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029284",
-      "date": "2025-05-21",
-      "date_originale": "21 mai 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 21 mai 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029283",
-      "date": "2025-05-14",
-      "date_originale": "14 mai 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 14 mai 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029282",
-      "date": "2025-05-07",
-      "date_originale": "7 mai 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 7 mai 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029280",
-      "date": "2025-04-30",
-      "date_originale": "30 avril 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 30 avril 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029279",
-      "date": "2025-04-09",
-      "date_originale": "9 avril 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 9 avril 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029278",
-      "date": "2025-04-02",
-      "date_originale": "2 avril 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 2 avril 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029276",
-      "date": "2025-03-26",
-      "date_originale": "26 mars 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 26 mars 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029275",
-      "date": "2025-03-19",
-      "date_originale": "19 mars 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 19 mars 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029274",
-      "date": "2025-03-12",
-      "date_originale": "12 mars 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 12 mars 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029273",
-      "date": "2025-03-05",
-      "date_originale": "5 mars 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 5 mars 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029272",
-      "date": "2025-02-26",
-      "date_originale": "26 février 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 26 février 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029271",
-      "date": "2025-02-12",
-      "date_originale": "12 février 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 12 février 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029270",
-      "date": "2025-02-05",
-      "date_originale": "5 février 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 5 février 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029268",
-      "date": "2025-01-29",
-      "date_originale": "29 janvier 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 29 janvier 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029267",
-      "date": "2025-01-20",
-      "date_originale": "20 janvier 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 20 janvier 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1029266",
-      "date": "2025-01-15",
-      "date_originale": "15 janvier 2025",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 15 janvier 2025",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025827",
-      "date": "2024-12-18",
-      "date_originale": "18 décembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 18 décembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025826",
-      "date": "2024-12-11",
-      "date_originale": "11 décembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 11 décembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025825",
-      "date": "2024-12-04",
-      "date_originale": "4 décembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 4 décembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025824",
-      "date": "2024-11-27",
-      "date_originale": "27 novembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 27 novembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025823",
-      "date": "2024-11-20",
-      "date_originale": "20 novembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 20 novembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025822",
-      "date": "2024-11-13",
-      "date_originale": "13 novembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 13 novembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025821",
-      "date": "2024-11-06",
-      "date_originale": "6 novembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 6 novembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025820",
-      "date": "2024-10-30",
-      "date_originale": "30 octobre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 30 octobre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025819",
-      "date": "2024-10-09",
-      "date_originale": "9 octobre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 9 octobre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025818",
-      "date": "2024-10-02",
-      "date_originale": "2 octobre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 2 octobre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025976",
-      "date": "2024-09-25",
-      "date_originale": "25 septembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 25 septembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025816",
-      "date": "2024-09-18",
-      "date_originale": "18 septembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 18 septembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025815",
-      "date": "2024-09-11",
-      "date_originale": "11 septembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 11 septembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025813",
-      "date": "2024-09-04",
-      "date_originale": "4 septembre 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 4 septembre 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025812",
-      "date": "2024-08-28",
-      "date_originale": "28 août 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 28 août 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025810",
-      "date": "2024-08-21",
-      "date_originale": "21 août 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 21 août 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025809",
-      "date": "2024-08-14",
-      "date_originale": "14 août 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 14 août 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025807",
-      "date": "2024-07-03",
-      "date_originale": "3 juillet 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 3 juillet 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1027257",
-      "date": "2024-06-26",
-      "date_originale": "26 juin 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 26 juin 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025804",
-      "date": "2024-06-19",
-      "date_originale": "19 juin 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 19 juin 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025803",
-      "date": "2024-06-12",
-      "date_originale": "12 juin 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 12 juin 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025802",
-      "date": "2024-06-05",
-      "date_originale": "5 juin 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 5 juin 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025800",
-      "date": "2024-05-29",
-      "date_originale": "29 mai 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 29 mai 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025799",
-      "date": "2024-05-22",
-      "date_originale": "22 mai 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 22 mai 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025798",
-      "date": "2024-05-15",
-      "date_originale": "15 mai 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 15 mai 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025796",
-      "date": "2024-05-08",
-      "date_originale": "8 mai 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 8 mai 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025792",
-      "date": "2024-04-24",
-      "date_originale": "24 avril 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 24 avril 2024",
-      "parties": []
-    },
-    {
-      "url": "https://www.vd.ch/actualites/decisions-du-conseil-detat/seance-du-conseil-detat/seance/1025793",
-      "date": "2024-04-17",
-      "date_originale": "17 avril 2024",
-      "date_decouverte": "2025-06-25T12:35:28.217742",
-      "titre": "Séance du Conseil d'Etat du 17 avril 2024",
-      "parties": []
+      "parties": [
+        {
+          "titre": "Le Conseil d’État soutient l’assainissement énergétique des bâtiments communaux et scolaires",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2310693",
+              "nom": "EMPD Soutien à la rénovation énergétique et durable des bâtiments communaux et des écoles (mesure emblématique du PCV-24) et Rapport à la motion Valérie Schwaar et consorts pour un fonds cantonal pour l'assainissement énergétique des bâtiments communaux (09_MOT_089) - Texte adopté par CE - Soutien à la rénovation énergétique et durable - PCV-24 - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Soutien à la mise en place des mesures sociales en faveur du secteur agricole",
+          "fichiers": []
+        },
+        {
+          "titre": "Mendicité : entrée en vigueur des nouvelles dispositions légales le 1er juillet",
+          "fichiers": []
+        },
+        {
+          "titre": "Agripôle de Grange-Verney à Moudon : coup d’envoi des études du centre d’enseignement professionnel des métiers de la terre",
+          "fichiers": []
+        },
+        {
+          "titre": "Un crédit pour démarrer les études du nouveau pôle alimentaire pénitentiaire",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2310772",
+              "nom": "EMPD accordant au Conseil d'État un crédit d’étude de CHF 3'151’000.- pour financer les études relatives à la construction du nouveau pôle alimentaire (NPA) des établissements de la plaine de l’Orbe (EPO) sur le site du pôle Pénitentiaire du Nord Vaudois (PPNV) - Texte adopté par CE - EMPD CrE de 3'151'000 Pôle alimentaire EPO - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Gestion des biodéchets : état des lieux et perspectives",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2309398",
+              "nom": "Réponse du Conseil d'Etat au Grand Conseil à l'interpellation Jean Valentin de Saussure et consorts - Collecte et valorisation des déchets organiques – Comment favoriser le retour à la terre ? (25_INT_14) - Texte adopté par le CE - R-CE INT De Saussure 25_INT_14 - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Subsides : les primes de référence reflètent les choix de la population",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2309406",
+              "nom": "Réponse du Conseil d'Etat au Grand Conseil à la simple question Fabrice Moscheni - Subsides à l’assurance maladie : quid du calcul des primes cantonales de référence (25_QUE_35) - Texte adopté par CE - R-CE QUE Moscheni 25_QUE_35 - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Subsides : primes de référence et ajustement des franchises",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2309409",
+              "nom": "Réponse du Conseil d'Etat au Grand Conseil à la simple question Fabrice Moscheni - Subsides à l’assurance maladie : des primes cantonales de référence décroissantes selon le revenu ? (25_QUE_34) - Texte adopté par CE - R-CE QUE Moscheni 25_QUE_34 - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Couverture assurance éléments naturels des téléphériques",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2309413",
+              "nom": "Réponse du Conseil d'Etat au Grand Conseil à la simple question Alberto Mocchi au nom Pierre-François Mottier - Là haut sur la montagne l'était un beau... téléphérique non assuré (25_QUE_31) - Texte adopté par CE - R-CE QUE Mocchi 25_QUE_31 - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Dégâts causés par les corvidés en milieu agricole",
+          "fichiers": []
+        },
+        {
+          "titre": "Soutien aux exploitations ayant subi des dégâts dus aux corvidés",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2309493",
+              "nom": "Projet de règlement du CE Règlement sur l'agroécologie (RAgrEco) - Texte adopté par CE - Règlement sur l'agroécologie - publié"
+            }
+          ]
+        },
+        {
+          "titre": "Désignation de nouveaux membres de la Commission de jeunes",
+          "fichiers": []
+        },
+        {
+          "titre": "Renouvellement des membres de la Chambre consultative de la jeunesse et désignation de la présidence",
+          "fichiers": []
+        },
+        {
+          "titre": "Consultation fédérale : loi sur la promotion du haut débit",
+          "fichiers": [
+            {
+              "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2309412",
+              "nom": "Consultation fédérale (CE) Loi fédérale sur la promotion du déploiement d'infrastructures pour le haut débit (Loi sur la promotion du haut-débit; LPHD) - Lettre du CE publiée"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
