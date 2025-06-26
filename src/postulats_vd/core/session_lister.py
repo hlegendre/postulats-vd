@@ -18,6 +18,7 @@ from bs4 import BeautifulSoup, Tag
 
 from ..config import (
     MAX_LISTING_PAGES,
+    OPTIMIZATION_THRESHOLD_DAYS,
     STOP_DATE,
 )
 from ..utils.date_parser import DateParser
@@ -28,7 +29,7 @@ from .storage import Seance, Storage
 
 SessionListerResult = TypedDict(
     "SessionListerResult",
-    {"success": bool, "pages_processed": int, "new_seances_count": int, "stored_seances": int, "stop_reached": bool},
+    {"success": bool, "pages_processed": int, "new_seances_count": int, "stored_seances": int, "optimized": bool},
 )
 
 
@@ -41,13 +42,15 @@ class SessionLister:
             storage (Storage): Stockage des données
         """
 
-        self.logger = LoggingUtils.setup_simple_logger("ExtracteurSéances")
+        self.logger = LoggingUtils.setup_simple_logger("ListeurSéances")
         self.storage = storage
 
         self.logger.info(f"Découvreur de séances initialisé avec la base de données : {self.storage.get_file_path()}")
         self.logger.info(f"Séances existantes chargées : {self.storage.seances_count()}")
 
-    def _extract_seances(self, html_content: str, base_url: str, current_date: str) -> tuple[int, int, bool]:
+    def _extract_seances(
+        self, html_content: str, base_url: str, current_date: str, stop_date: str | None
+    ) -> tuple[int, int, bool]:
         """
         Extrait les séances de la page, sans détails.
         La base de donnée est mise à jour à la volée.
@@ -56,6 +59,7 @@ class SessionLister:
             html_content (str): Contenu HTML à analyser
             base_url (str): URL de base pour construire les URLs complètes
             current_date (str): Date de découverte pour les séances
+            stop_date (str): Date d'arrêt pour le listage
 
         Returns:
             int: Nombre de nouvelles séances trouvées
@@ -86,7 +90,7 @@ class SessionLister:
                         self.logger.error(f"Impossible de parser la date '{date_str}': {e}")
                         continue
 
-                    if date_str < STOP_DATE:
+                    if stop_date and date_str < stop_date:
                         self.logger.info(f"Date limite atteinte ({STOP_DATE}).")
                         return nb_nouvelles_seances, nb_seances_existantes, False
 
@@ -144,15 +148,51 @@ class SessionLister:
 
         return None
 
-    def list(self) -> SessionListerResult:
+    def _get_stop_date(self, relist: bool = False) -> tuple[str | None, bool]:
+        """
+        Détermine la véritable date d'arrêt en fonction du mode de relistage.
+
+        Args:
+            relist (bool): Force le relistage des séances. Si False, on scanne uniquement les séances les plus récentes non existantes.
+
+        Returns:
+            tuple[str | None, bool]: La date d'arrêt et un booléen indiquant si l'optimisation est activée
+        """
+        if relist:
+            self.logger.debug("Mode relistage activé, car l'utilisateur le demande")
+            return STOP_DATE, False
+
+        if not STOP_DATE:
+            self.logger.debug("Mode relistage activé, car la date d'arrêt n'est pas définie")
+            return None, False
+
+        date_range = self.storage.get_date_range()
+        if not date_range:
+            self.logger.debug("Mode relistage activé, car aucune séance n'est stockée")
+            return STOP_DATE, False
+
+        diff = (datetime.strptime(date_range[0], "%Y-%m-%d") - datetime.strptime(STOP_DATE, "%Y-%m-%d")).days
+        if diff > OPTIMIZATION_THRESHOLD_DAYS:
+            self.logger.debug("Mode relistage activé car la date la plus ancienne est trop éloignée de la date d'arrêt")
+            return STOP_DATE, True
+
+        self.logger.debug(f"Optimisation de la date d'arrêt : {date_range[1]}")
+        return date_range[1], True
+
+    def list(self, relist: bool = False) -> SessionListerResult:
         """
         Méthode principale pour extraire les séances du Conseil d'État avec pagination, mais sans détails.
+
+        Args:
+            relist (bool): Force le relistage des séances. Si False, on scanne uniquement les séances les plus récentes non existantes.
 
         Returns:
             SessionListerResult: Résumé de l'extraction
         """
         current_date = datetime.now().isoformat()
         self.logger.debug(f"Date de découverte pour cette session : {current_date}")
+        stop_date, optimized = self._get_stop_date(relist)
+        self.logger.debug(f"Date d'arrêt pour le listage : {stop_date}{' (optimisé)' if optimized else ''}")
 
         first_url = "https://www.vd.ch/actualites/decisions-du-conseil-detat"
         self.logger.info(f"Début de l'extraction des séances depuis : {first_url}")
@@ -161,11 +201,10 @@ class SessionLister:
         base_url = extract_base_url(first_url)
 
         new_seances_count = 0
-        stop_reached = False
         current_url: str | None = first_url
         visited_urls: set[str] = set()  # Pour éviter les boucles infinies
 
-        while current_url and len(visited_urls) < MAX_LISTING_PAGES and not stop_reached:
+        while current_url and len(visited_urls) < MAX_LISTING_PAGES:
             # Vérifier si l'URL a déjà été visitée
             if current_url in visited_urls:
                 self.logger.debug(f"URL déjà visitée, arrêt pour éviter la boucle infinie : {current_url}")
@@ -181,7 +220,7 @@ class SessionLister:
                 break
 
             # Extraire les liens des séances
-            nb_nouv, nb_exist, cont = self._extract_seances(html_content, base_url, current_date)
+            nb_nouv, nb_exist, cont = self._extract_seances(html_content, base_url, current_date, stop_date)
 
             self.logger.info(
                 f"Séances trouvées sur la page {len(visited_urls)} : {nb_nouv} nouvelle(s), {nb_exist} existante(s)"
@@ -204,5 +243,5 @@ class SessionLister:
             "pages_processed": len(visited_urls),
             "new_seances_count": new_seances_count,
             "stored_seances": stored_seances,
-            "stop_reached": stop_reached,
+            "optimized": optimized,
         }

@@ -1,12 +1,13 @@
-# Téléchargeur de Séances du Conseil d'État VD
+# Téléchargeur de postulats du Conseil d'État VD
 
-Ce script permet d'extraire automatiquement les informations détaillées des séances du Conseil d'État du canton de Vaud depuis le site officiel.
+Ce script permet d'extraire automatiquement les postulats des séances du Conseil d'État du canton de Vaud depuis le site officiel.
 
 ## Fonctionnalités
 
 - **Extraction automatique** : Récupère les URLs, dates, titres et contenus détaillés des séances depuis le site officiel
 - **Système de logging unifié** : Un seul fichier JSON récapitule toutes les séances
 - **Détection des nouvelles séances** : Ignore automatiquement les séances déjà connues
+- **Optimisation du listing** : Récupération des séances les plus récentes manquantes sauf si la date d'arrêt est éloignée de la séance la plus ancienne
 - **Métadonnées de découverte** : Chaque séance inclut sa date de première découverte
 - **Parsing des dates françaises** : Conversion automatique des dates françaises en format ISO
 - **Pagination automatique** : Parcourt automatiquement toutes les pages disponibles
@@ -101,6 +102,9 @@ python run.py -v
 # Mode debug (affiche tous les détails)
 python run.py -vv
 
+# Force le relistage des séances
+python run.py --relist
+
 # Afficher l'aide
 python run.py --help
 ```
@@ -111,6 +115,7 @@ python run.py --help
   - `-v` : Mode info (affiche les informations de base)
   - `-vv` : Mode debug (affiche tous les détails)
   - Par défaut : Mode silencieux (affiche uniquement les résultats finaux)
+- `--relist` : Force le relistage des séances
 
 ### Niveaux de verbosité
 
@@ -118,11 +123,24 @@ python run.py --help
 - **Mode info** (`-v`) : Affiche les informations de base comme le dossier de sortie et la date limite d'arrêt
 - **Mode debug** (`-vv`) : Affiche tous les détails, y compris les URLs traitées, les fichiers téléchargés, etc.
 
+```bash
+python run.py -v / -vv
+```
+
+### Mode relistage
+
+Le mode relistage permet de récupérer toutes les séances depuis aujourd'hui jusqu'à la date d'arrêt.
+Par défaut, on scanne uniquement les séances les plus récentes non existantes.
+
+```bash
+python run.py --relist
+```
+
 ### Sortie
 
 Le script affiche trois sections principales :
 
-1. **Découverte des séances** : Nombre de nouvelles séances trouvées, total de séances stockées, et pages traitées
+1. **Découverte des séances** : Nombre de nouvelles séances trouvées, total de séances stockées, et pages traitées (avec optimisation ou non)
 2. **Extraction des séances** : Nombre de nouvelles séances extraites, séances existantes, et séances en erreur
 3. **Téléchargement des fichiers** : Nombre de fichiers téléchargés, ignorés, existants, et en erreur
 
@@ -130,7 +148,7 @@ Exemple de sortie :
 
 ```text
 === Découverte des Séances du Conseil d'État VD ===
-✅ OK : nouvelles = 2 / totales = 10 (pages = 1)
+✅ OK : nouvelles = 2 / totales = 10 (pages = 1, optimisé)
 
 === Extraction des Séances du Conseil d'État VD ===
 ✅ OK : nouvelles = 2 / existantes = 8 / en erreur = 0
@@ -152,16 +170,16 @@ Le projet utilise plusieurs outils pour maintenir la qualité du code :
 
 ### Installation des hooks pre-commit
 
-Pour installer les hooks pre-commit automatiquement :
+Pour installer les hooks pre-commit manuellement :
 
 ```bash
-./setup.sh
+uv run pre-commit install
 ```
 
-Ou manuellement :
+sinon, il suffit de lancer le script de configuration :
 
 ```bash
-chmod +x .git/hooks/pre-commit
+./setup.sh / setup.bat
 ```
 
 ### Utilisation des outils de qualité
@@ -181,15 +199,15 @@ uv run ruff format
 **Tester manuellement le hook pre-commit :**
 
 ```bash
-.git/hooks/pre-commit
+uv run pre-commit run --all-files
 ```
 
 ### Comportement des hooks
 
 Le hook pre-commit s'exécute automatiquement avant chaque commit et :
 
-1. **Vérifie le formatage** : S'assure que le code respecte les standards Black
-2. **Lance le linter** : Détecte les erreurs de style et de logique avec Flake8
+1. **Vérifie le formatage** : S'assure que le code respecte les standards Ruff
+2. **Lance le linter** : Détecte les erreurs de style et de logique avec Ruff
 3. **Bloque le commit** : Si des erreurs sont trouvées, le commit est annulé
 
 **Pour ignorer le hook (urgence uniquement) :**
@@ -214,16 +232,6 @@ git commit --no-verify -m "message d'urgence"
 - Compare les URLs pour identifier les nouvelles séances
 - Ajoute uniquement les nouvelles séances avec leur `date_decouverte`
 - Met à jour le fichier JSON avec toutes les séances et leur contenu détaillé
-
-### Avantages du système
-
-1. **Pas de duplication** : Un seul fichier contient toutes les séances
-2. **Traçabilité** : Chaque séance garde sa date de première découverte
-3. **Efficacité** : Les séances déjà connues sont ignorées
-4. **Historique** : Conservation de l'historique complet des découvertes
-5. **Pagination automatique** : Parcourt toutes les pages sans intervention
-6. **Arrêt intelligent** : S'arrête automatiquement à la date limite configurée
-7. **Extraction complète** : Toutes les discussions et fichiers sont extraits pour chaque séance
 
 ## Tests
 
@@ -255,6 +263,7 @@ Le script utilise le fichier `src/postulats_vd/config/settings.py` pour sa confi
 
 - `STOP_DATE` : Date limite d'arrêt (format YYYY-MM-DD, par défaut `"2024-01-01"`)
 - `FILE_PATTERNS` : Patterns pour filtrer les fichiers à télécharger (par défaut `["_POS_"]`)
+- `OPTIMIZATION_THRESHOLD_DAYS` : Nombre de jours maximum entre la date d'arrêt et la date la plus ancienne pour activer l'optimisation (par défaut `6`)
 
 ### Paramètres de requête HTTP
 

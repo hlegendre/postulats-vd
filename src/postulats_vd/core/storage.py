@@ -254,6 +254,20 @@ class Storage:
         """
         return len(self._seances_cache)
 
+    def get_date_range(self) -> tuple[str, str] | None:
+        """
+        Retourne la plage de dates des séances stockées.
+
+        Returns:
+            tuple[str, str] | None : date la plus ancienne et la plus récente, ou None si aucune séance
+        """
+        if not self._seances_cache:
+            return None
+
+        oldest_seance = min(self._seances_cache.values(), key=lambda x: x.get("date", ""))
+        most_recent_seance = max(self._seances_cache.values(), key=lambda x: x.get("date", ""))
+        return oldest_seance["date"], most_recent_seance["date"]
+
     def get_file_path(self) -> str:
         """
         Retourne le chemin du fichier de stockage.

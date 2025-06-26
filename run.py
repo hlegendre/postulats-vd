@@ -18,12 +18,15 @@ Exemples d'utilisation:
   python run.py              # Mode silencieux (par défaut)
   python run.py -v           # Mode info (affiche les informations de base)
   python run.py -vv          # Mode debug (affiche tous les détails)
+  python run.py --relist     # Force le relistage des séances
         """,
     )
 
     parser.add_argument(
         "-v", "--verbose", action="count", default=0, help="Niveau de verbosité (-v pour info, -vv pour debug)"
     )
+
+    parser.add_argument("--relist", action="store_true", help="Force le relistage des séances")
 
     return parser.parse_args()
 
@@ -48,13 +51,10 @@ def main():
     # Découverte des séances
     print("=== Découverte des Séances du Conseil d'État VD ===")
     sessionFinder = SessionLister(storage=storage)
-    result = sessionFinder.list()
+    result = sessionFinder.list(relist=args.relist)
     if result["success"]:
-        if result["stop_reached"]:
-            print(f"> arrêt anticipé : date limite ({STOP_DATE}) atteinte)")
-
         print(
-            f"✅ OK : nouvelles = {result['new_seances_count']} / totales = {result['stored_seances']} (pages = {result['pages_processed']})"
+            f"✅ OK : nouvelles = {result['new_seances_count']} / totales = {result['stored_seances']} (pages = {result['pages_processed']}{', optimisé' if result['optimized'] else ''})"
         )
     else:
         print(f"❌ Échec de la découverte : {result.get('error', 'Erreur inconnue')}")
