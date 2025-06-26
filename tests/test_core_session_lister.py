@@ -15,7 +15,7 @@ from src.postulats_vd.core.session_lister import SessionLister
 from src.postulats_vd.core.storage import Storage
 
 
-def test_single_file_logging():
+def test_single_file_logging() -> None:
     """Test du nouveau système de logging avec un seul fichier JSON."""
 
     # Créer un dossier temporaire pour les tests
@@ -111,8 +111,14 @@ def test_single_file_logging():
 
 
 if __name__ == "__main__":
-    success = test_single_file_logging()
-    if success:
-        print("🎉 Tous les tests ont réussi !")
-    else:
-        print("❌ Certains tests ont échoué.")
+    print("🧪 Démarrage des tests de la liste des séances...")
+    print()
+
+    try:
+        test_single_file_logging()
+    except Exception as e:
+        print(f"❌ Erreur lors des tests : {e}")
+        exit(1)
+
+    print("🎉 Tous les tests ont réussi !")
+    print()

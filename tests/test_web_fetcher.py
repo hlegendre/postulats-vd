@@ -8,7 +8,7 @@ import time
 from src.postulats_vd.utils.web_fetcher import WebFetcher
 
 
-def test_web_fetcher_singleton():
+def test_web_fetcher_singleton() -> None:
     """Test that WebFetcher follows singleton pattern"""
     # Create two instances
     fetcher1 = WebFetcher()
@@ -24,7 +24,7 @@ def test_web_fetcher_singleton():
     assert fetcher1.logger is fetcher2.logger
 
 
-def test_web_fetcher_initialization():
+def test_web_fetcher_initialization() -> None:
     """Test that WebFetcher initializes correctly"""
     fetcher = WebFetcher()
 
@@ -42,7 +42,7 @@ def test_web_fetcher_initialization():
     assert hasattr(fetcher, "_last_request_time")
 
 
-def test_rate_limiting_timestamp():
+def test_rate_limiting_timestamp() -> None:
     """Test that rate limiting timestamp is updated after requests"""
     fetcher = WebFetcher()
 
@@ -59,3 +59,18 @@ def test_rate_limiting_timestamp():
     # Verify timestamp was set
     assert fetcher._last_request_time > 0
     assert fetcher._last_request_time == initial_timestamp
+
+if __name__ == "__main__":
+    print("🧪 Démarrage des tests de WebFetcher...")
+    print()
+
+    try:
+        test_web_fetcher_singleton()
+        test_web_fetcher_initialization()
+        test_rate_limiting_timestamp()
+    except Exception as e:
+        print(f"❌ Erreur lors des tests : {e}")
+        exit(1)
+
+    print("🎉 Tous les tests ont réussi !")
+    print()

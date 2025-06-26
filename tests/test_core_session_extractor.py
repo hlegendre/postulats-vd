@@ -17,7 +17,7 @@ from src.postulats_vd.core.session_extractor import SessionExtractor, _parse_dis
 from src.postulats_vd.core.storage import Seance, Storage
 
 
-def test_session_extractor_initialization():
+def test_session_extractor_initialization() -> None:
     """Test de l'initialisation de l'extracteur de sessions."""
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -39,7 +39,7 @@ def test_session_extractor_initialization():
         print()
 
 
-def test_parse_partie_with_valid_data():
+def test_parse_discussion_with_valid_data() -> None:
     """Test de l'extraction d'une partie avec des données valides."""
 
     print("=== Test d'extraction d'une partie avec des données valides ===")
@@ -92,7 +92,7 @@ def test_parse_partie_with_valid_data():
     print()
 
 
-def test_parse_partie_without_h2():
+def test_parse_discussion_without_h2() -> None:
     """Test de l'extraction d'une partie sans titre h2."""
 
     print("=== Test d'extraction d'une partie sans titre h2 ===")
@@ -126,7 +126,7 @@ def test_parse_partie_without_h2():
     print()
 
 
-def test_parse_seance_with_multiple_parts():
+def test_parse_seance_with_multiple_parts() -> None:
     """Test de l'extraction d'une séance avec plusieurs discussions."""
 
     print("=== Test d'extraction d'une séance avec plusieurs discussions ===")
@@ -175,7 +175,7 @@ def test_parse_seance_with_multiple_parts():
     print()
 
 
-def test_extract_seance_success():
+def test_extract_seance_success() -> None:
     """Test de l'extraction réussie d'une séance."""
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -228,7 +228,7 @@ def test_extract_seance_success():
         print()
 
 
-def test_extract_all_seances_empty():
+def test_extract_all_seances_empty() -> None:
     """Test de l'extraction de toutes les séances (cas vide)."""
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -249,7 +249,7 @@ def test_extract_all_seances_empty():
         assert result["success"], "L'extraction devrait réussir même sans séances"
         assert result["nb_extracted"] == 0, "Aucune séance ne devrait être extraite"
         assert result["nb_error"] == 0, "Aucune erreur ne devrait survenir"
-        assert result["nb_ignored"] == 0, "Aucune séance ne devrait être ignorée"
+        assert result["nb_already"] == 0, "Aucune séance ne devrait être déjà présente"
 
         print("   ✅ Aucune séance à traiter (comportement attendu)")
         print()
@@ -261,8 +261,8 @@ if __name__ == "__main__":
 
     try:
         test_session_extractor_initialization()
-        test_parse_partie_with_valid_data()
-        test_parse_partie_without_h2()
+        test_parse_discussion_with_valid_data()
+        test_parse_discussion_without_h2()
         test_parse_seance_with_multiple_parts()
         test_extract_seance_success()
         test_extract_all_seances_empty()

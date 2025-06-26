@@ -9,10 +9,10 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from src.postulats_vd.core.storage import Storage
+from src.postulats_vd.core.storage import Seance, Storage
 
 
-def test_storage():
+def test_storage() -> None:
     """Test des fonctionnalités de base de Storage."""
     print("=== Test de Storage ===")
 
@@ -35,7 +35,7 @@ def test_storage():
 
         # Test 2: Ajouter une nouvelle séance
         print(f"\n➕ Test 2: Ajouter une nouvelle séance")
-        seance_details = {
+        seance_details: Seance = {
             "url": "https://www.vd.ch/test-seance-1",
             "date": test_date,
             "date_originale": "15 janvier 2025",
@@ -61,7 +61,7 @@ def test_storage():
 
         # Test 5: Ajouter une deuxième séance
         print(f"\n➕ Test 5: Ajouter une deuxième séance")
-        seance_details_2 = {
+        seance_details_2: Seance = {
             "url": "https://www.vd.ch/test-seance-2",
             "date": "2025-01-22",
             "date_originale": "22 janvier 2025",
@@ -86,4 +86,14 @@ def test_storage():
 
 
 if __name__ == "__main__":
-    test_storage()
+    print("🧪 Démarrage des tests de Storage...")
+    print()
+
+    try:
+        test_storage()
+    except Exception as e:
+        print(f"❌ Erreur lors des tests : {e}")
+        exit(1)
+
+    print("🎉 Tous les tests ont réussi !")
+    print()

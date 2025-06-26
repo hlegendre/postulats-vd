@@ -5,10 +5,10 @@ Test de la classe LoggingUtils
 Ce script teste les fonctionnalités de la classe utilitaire de logging.
 """
 
-from postulats_vd.utils.logging import LoggingUtils
+from src.postulats_vd.utils.logging import LoggingUtils
 
 
-def test_logging_utils():
+def test_logging_utils() -> None:
     """Test des fonctionnalités de LoggingUtils."""
     print("=== Test de LoggingUtils ===")
 
@@ -41,4 +41,14 @@ def test_logging_utils():
 
 
 if __name__ == "__main__":
-    test_logging_utils()
+    print("🧪 Démarrage des tests de LoggingUtils...")  
+    print()
+
+    try:
+        test_logging_utils()
+    except Exception as e:
+        print(f"❌ Erreur lors des tests : {e}")
+        exit(1)
+
+    print("🎉 Tous les tests ont réussi !")
+    print()
