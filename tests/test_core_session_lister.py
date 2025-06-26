@@ -8,10 +8,11 @@ du téléchargeur de séances.
 
 import json
 import tempfile
-from pathlib import Path
 from datetime import datetime
-from postulats_vd.core.session_lister import SessionLister
-from postulats_vd.core.storage import Storage
+from pathlib import Path
+
+from src.postulats_vd.core.session_lister import SessionLister
+from src.postulats_vd.core.storage import Storage
 
 
 def test_single_file_logging():
@@ -50,9 +51,9 @@ def test_single_file_logging():
 
             # Vérifier que toutes les séances ont une date de découverte
             seances_with_discovery = [s for s in seances if "date_decouverte" in s]
-            assert len(seances_with_discovery) == len(
-                seances
-            ), "Toutes les séances doivent avoir une date de découverte"
+            assert len(seances_with_discovery) == len(seances), (
+                "Toutes les séances doivent avoir une date de découverte"
+            )
             print(f"   🕒 {len(seances_with_discovery)} séances avec date de découverte")
 
         print()
@@ -69,8 +70,8 @@ def test_single_file_logging():
 
         print()
 
-        # Test avec ajout manuel d'une nouvelle séance
-        print("3. Test avec ajout manuel d'une nouvelle séance...")
+        # Test après suppression manuelle d'une séance
+        print("3. Test après suppression manuelle d'une séance...")
 
         # Lire le fichier existant
         with open(seances_file, "r", encoding="utf-8") as f:
@@ -80,16 +81,8 @@ def test_single_file_logging():
             assert isinstance(seances, list), "La valeur de 'seances' doit être une liste"
             assert len(seances) > 0, "Aucune séance trouvée dans le fichier"
 
-        # Ajouter une nouvelle séance manuellement
-        new_seance = {
-            "url": "https://www.vd.ch/test/nouvelle-seance",
-            "date": "2025-06-25",
-            "date_originale": "2025-06-25",
-            "titre": "Séance du Conseil d'Etat du 25 juin 2025",
-            "date_decouverte": datetime.now().isoformat(),
-            "discussions": [],
-        }
-        seances.append(new_seance)
+        # Supprimer la première séance
+        seances.pop(0)
 
         # Sauvegarder le fichier modifié
         data["seances"] = seances
@@ -99,21 +92,18 @@ def test_single_file_logging():
         with open(seances_file, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
-        print(f"   📝 Nouvelle séance ajoutée manuellement")
+        print(f"   📝 Nouvelle séance supprimée manuellement")
 
-        print()
-
-        # Troisième lancement - devrait détecter la nouvelle séance
-        print("4. Troisième lancement (après ajout manuel)...")
         storage = Storage(output_folder=str(temp_path))
         downloader3 = SessionLister(storage)
         result3 = downloader3.list()
 
         assert result3["success"], f"Échec du troisième lancement : {result3.get('error', 'Erreur inconnue')}"
-        assert (
-            result3["stored_seances"] == result1["stored_seances"] + 1
-        ), "Le nombre de séances stockées doit avoir augmenté de 1"
-        assert result3["new_seances_count"] == 0, "Aucune nouvelle séance doit être ajoutée"
+        assert result3["stored_seances"] == result1["stored_seances"], (
+            "Le nombre de séances stockées doit être le même"
+        )
+        assert result3["new_seances_count"] == 1, "Une nouvelle séance doit être ajoutée"
+
         print(f"   ✅ Succès : {result3['stored_seances']} séances totales, {result3['new_seances_count']} nouvelles")
 
         print()

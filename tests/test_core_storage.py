@@ -6,9 +6,10 @@ Ce script teste les fonctionnalités de base de la classe Storage.
 """
 
 import tempfile
-from pathlib import Path
 from datetime import datetime
-from postulats_vd.core.storage import Storage
+from pathlib import Path
+
+from src.postulats_vd.core.storage import Storage
 
 
 def test_storage():

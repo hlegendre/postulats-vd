@@ -7,13 +7,14 @@ de l'extracteur de contenu des séances.
 """
 
 import tempfile
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from unittest.mock import patch
+
 from bs4 import BeautifulSoup
 
-from postulats_vd.core.session_extractor import SessionExtractor, _parse_partie, _parse_seance
-from postulats_vd.core.storage import Storage, Seance
+from src.postulats_vd.core.session_extractor import SessionExtractor, _parse_discussion, _parse_seance
+from src.postulats_vd.core.storage import Seance, Storage
 
 
 def test_session_extractor_initialization():
@@ -32,7 +33,6 @@ def test_session_extractor_initialization():
 
         # Vérifier que l'extracteur a été initialisé correctement
         assert extractor.storage is not None, "Le storage n'a pas été initialisé"
-        assert extractor.web_fetcher is not None, "Le html_fetcher n'a pas été initialisé"
         assert extractor.logger is not None, "Le logger n'a pas été initialisé"
 
         print("   ✅ Extracteur initialisé correctement")
@@ -55,8 +55,18 @@ def test_parse_partie_with_valid_data():
     </div>
     """
 
+    # Créer une séance de test pour passer en paramètre
+    test_seance: Seance = {
+        "url": "https://www.vd.ch/test/seance",
+        "date": "2025-01-01",
+        "date_originale": "1er janvier 2025",
+        "date_decouverte": datetime.now().isoformat(),
+        "titre": "Séance du Conseil d'Etat du 1er janvier 2025",
+        "discussions": [],
+    }
+
     soup = BeautifulSoup(test_html, "html.parser")
-    partie = _parse_partie(soup)
+    partie = _parse_discussion(soup, test_seance)
 
     # Vérifier que la partie a été extraite correctement
     assert partie is not None, "La partie devrait être extraite"
@@ -71,6 +81,12 @@ def test_parse_partie_with_valid_data():
     ]
     for expected_url in expected_urls:
         assert expected_url in file_urls, f"URL attendue manquante : {expected_url}"
+
+    # Vérifier que les alias ont été générés correctement
+    file_aliases = [f["alias"] for f in partie["fichiers"]]
+    expected_aliases = ["20250101_123.pdf", "20250101_456.pdf"]
+    for expected_alias in expected_aliases:
+        assert expected_alias in file_aliases, f"Alias attendu manquant : {expected_alias}"
 
     print("   ✅ Partie extraite correctement")
     print()
@@ -90,8 +106,18 @@ def test_parse_partie_without_h2():
     </div>
     """
 
+    # Créer une séance de test pour passer en paramètre
+    test_seance: Seance = {
+        "url": "https://www.vd.ch/test/seance",
+        "date": "2025-01-01",
+        "date_originale": "1er janvier 2025",
+        "date_decouverte": datetime.now().isoformat(),
+        "titre": "Séance du Conseil d'Etat du 1er janvier 2025",
+        "discussions": [],
+    }
+
     soup = BeautifulSoup(test_html, "html.parser")
-    partie = _parse_partie(soup)
+    partie = _parse_discussion(soup, test_seance)
 
     # Vérifier que la partie n'est pas extraite
     assert partie is None, "La partie ne devrait pas être extraite sans h2"
@@ -121,8 +147,18 @@ def test_parse_seance_with_multiple_parts():
     </div>
     """
 
+    # Créer une séance de test pour passer en paramètre
+    test_seance: Seance = {
+        "url": "https://www.vd.ch/test/seance",
+        "date": "2025-01-01",
+        "date_originale": "1er janvier 2025",
+        "date_decouverte": datetime.now().isoformat(),
+        "titre": "Séance du Conseil d'Etat du 1er janvier 2025",
+        "discussions": [],
+    }
+
     soup = BeautifulSoup(test_html, "html.parser")
-    discussions = _parse_seance(soup)
+    discussions = _parse_seance(soup, test_seance)
 
     # Vérifier que toutes les discussions ont été extraites
     assert len(discussions) == 2, "Deux discussions devraient être extraites"
@@ -163,7 +199,7 @@ def test_extract_seance_success():
             "discussions": [],
         }
 
-        # Mock du HTML fetcher pour retourner du contenu valide
+        # Mock du WebFetcher pour retourner du contenu valide
         test_html = """
         <div id="main">
             <div class="col-md-12 pl-0 pr-0">
@@ -173,7 +209,10 @@ def test_extract_seance_success():
         </div>
         """
 
-        with patch.object(extractor.web_fetcher, "string", return_value=test_html):
+        with patch('src.postulats_vd.core.session_extractor.WebFetcher') as mock_web_fetcher:
+            mock_instance = mock_web_fetcher.return_value
+            mock_instance.html_string.return_value = test_html
+            
             success = extractor.extract_seance(test_seance)
 
         # Vérifier que l'extraction a réussi
