@@ -5,7 +5,7 @@ Fichier de configuration pour le "Téléchargeur de séances du Conseil d'État 
 # Configuration de base
 OUTPUT_FOLDER = "output"
 STORAGE_FILENAME = "storage.json"
-MAX_SESSIONS = 1000  # Nombre maximum de sessions du CE à parcourir (sécurité)
+MAX_LISTING_PAGES = 100  # Nombre maximum de pages de liste des séances du CE à parcourir (sécurité)
 
 # Date limite d'arrêt de découverte des séances du Conseil d'État (format: 'YYYY-MM-DD' ou None)
 STOP_DATE = "2024-01-01"

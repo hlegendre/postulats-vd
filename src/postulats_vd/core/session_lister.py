@@ -17,7 +17,7 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup, Tag
 
 from ..config import (
-    MAX_SESSIONS,
+    MAX_LISTING_PAGES,
     STOP_DATE,
 )
 from ..utils.date_parser import DateParser
@@ -165,7 +165,7 @@ class SessionLister:
         current_url: str | None = first_url
         visited_urls: set[str] = set()  # Pour éviter les boucles infinies
 
-        while current_url and len(visited_urls) < MAX_SESSIONS and not stop_reached:
+        while current_url and len(visited_urls) < MAX_LISTING_PAGES and not stop_reached:
             # Vérifier si l'URL a déjà été visitée
             if current_url in visited_urls:
                 self.logger.debug(f"URL déjà visitée, arrêt pour éviter la boucle infinie : {current_url}")

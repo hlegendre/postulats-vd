@@ -6,7 +6,7 @@ This module contains all configuration settings and constants used throughout th
 
 from .settings import (
     FILE_PATTERNS,
-    MAX_SESSIONS,
+    MAX_LISTING_PAGES,
     OUTPUT_FOLDER,
     PAGE_DELAY,
     REQUEST_TIMEOUT,
@@ -18,7 +18,7 @@ from .settings import (
 __all__ = [
     "OUTPUT_FOLDER",
     "STORAGE_FILENAME",
-    "MAX_SESSIONS",
+    "MAX_LISTING_PAGES",
     "STOP_DATE",
     "REQUEST_TIMEOUT",
     "USER_AGENT",
