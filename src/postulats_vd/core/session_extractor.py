@@ -13,13 +13,12 @@ from typing import List, TypedDict
 
 from bs4 import BeautifulSoup
 
-
-from .storage import Storage, Seance, SeancePartie
 from ..utils.logging import LoggingUtils
 from ..utils.web_fetcher import WebFetcher
+from .storage import Seance, SeancePartie, Storage
 
 
-def _parse_discussion(soup: BeautifulSoup, seance: Seance, id_discussion: int) -> SeancePartie:
+def _parse_discussion(soup: BeautifulSoup, seance: Seance) -> SeancePartie:
     h2 = soup.select_one("h2.heading")
     if not h2:
         print("error: no h2 found")
@@ -33,12 +32,10 @@ def _parse_discussion(soup: BeautifulSoup, seance: Seance, id_discussion: int) -
                 "nom": file.get_text(strip=True),
                 "alias": seance["date"].replace("-", "")
                 + "_"
-                + str(id_discussion + 1)
-                + "_"
-                + str(id_file + 1)
+                + file.get("href").replace("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=", "")
                 + ".pdf",
             }
-            for id_file, file in enumerate(soup.find_all("a", href=True))
+            for file in soup.find_all("a", href=True)
             if file.get("href").startswith("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=")
         ],
     }
@@ -56,7 +53,7 @@ def _parse_seance(soup: BeautifulSoup, seance: Seance) -> List[SeancePartie]:
     """
     parts = soup.select("#main .col-md-12.pl-0.pr-0")
 
-    return [_parse_discussion(part, seance, id_discussion) for id_discussion, part in enumerate(parts)]
+    return [_parse_discussion(part, seance) for part in parts]
 
 
 class SessionExtractorResult(TypedDict):
@@ -102,7 +99,7 @@ class SessionExtractor:
             seance["discussions"] = _parse_seance(soup, seance)
 
             self.storage.seance_upsert(seance)
-            self.logger.info(f"Séance \"{seance["date"]}\" extraite : {len(seance['discussions'])} discussions")
+            self.logger.info(f'Séance "{seance["date"]}" extraite : {len(seance["discussions"])} discussions')
             return True
         except Exception as e:
             self.logger.error(f"Erreur lors de l'extraction de la séance {seance['date']}: {e}")

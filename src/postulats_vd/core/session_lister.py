@@ -11,19 +11,20 @@ Date: 2024
 
 import re
 from datetime import datetime
+from typing import TypedDict
 from urllib.parse import urljoin
 
-from typing import TypedDict
 from bs4 import BeautifulSoup
+
 from ..config import (
     MAX_SESSIONS,
     STOP_DATE,
 )
-from .storage import Storage, Seance
-from ..utils.logging import LoggingUtils
-from ..utils.web_fetcher import WebFetcher
 from ..utils.date_parser import DateParser
+from ..utils.logging import LoggingUtils
 from ..utils.url import extract_base_url
+from ..utils.web_fetcher import WebFetcher
+from .storage import Seance, Storage
 
 
 class SessionListerResult(TypedDict):

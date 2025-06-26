@@ -5,14 +5,14 @@ This module contains all configuration settings and constants used throughout th
 """
 
 from .settings import (
-    OUTPUT_FOLDER,
-    STORAGE_FILENAME,
-    MAX_SESSIONS,
-    STOP_DATE,
-    REQUEST_TIMEOUT,
-    USER_AGENT,
-    PAGE_DELAY,
     FILE_PATTERNS,
+    MAX_SESSIONS,
+    OUTPUT_FOLDER,
+    PAGE_DELAY,
+    REQUEST_TIMEOUT,
+    STOP_DATE,
+    STORAGE_FILENAME,
+    USER_AGENT,
 )
 
 __all__ = [

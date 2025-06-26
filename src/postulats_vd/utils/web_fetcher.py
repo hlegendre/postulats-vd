@@ -6,11 +6,12 @@ This module provides utility functions for fetching HTML content from web pages.
 """
 
 import time
-import requests
-from bs4 import BeautifulSoup
 from typing import Optional
 
-from ..config import REQUEST_TIMEOUT, USER_AGENT, PAGE_DELAY
+import requests
+from bs4 import BeautifulSoup
+
+from ..config import PAGE_DELAY, REQUEST_TIMEOUT, USER_AGENT
 from .logging import LoggingUtils
 
 

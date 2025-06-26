@@ -9,15 +9,14 @@ Auteur: Hugues Le Gendre
 Date: 2024
 """
 
-
-from typing import TypedDict
-
 import os
 from enum import Enum
-from .storage import Storage, Seance, SeanceFichier
+from typing import TypedDict
+
+from ..config import FILE_PATTERNS, OUTPUT_FOLDER
 from ..utils.logging import LoggingUtils
 from ..utils.web_fetcher import WebFetcher
-from ..config import FILE_PATTERNS, OUTPUT_FOLDER
+from .storage import Seance, SeanceFichier, Storage
 
 
 class FileDownloaderResult(TypedDict):

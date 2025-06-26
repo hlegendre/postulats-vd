@@ -12,9 +12,10 @@ Date: 2024
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
+
 from ..config import OUTPUT_FOLDER, STORAGE_FILENAME
-from ..utils.logging import LoggingUtils, Logger
+from ..utils.logging import Logger, LoggingUtils
 
 
 class SeanceFichier(TypedDict):
