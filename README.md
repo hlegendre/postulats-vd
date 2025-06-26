@@ -126,7 +126,7 @@ Le script affiche :
 
 Exemple :
 
-```
+```text
 === Découverte des Séances du Conseil d'État VD ===
 ✅ OK : nouvelles = 2 / totales = 10 (pages = 1)
 === Récupération des Séances du Conseil d'État VD ===
