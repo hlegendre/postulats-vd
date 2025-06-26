@@ -37,7 +37,8 @@ Le script génère un fichier unique `output/storage.json` avec la structure sui
           "fichiers": [
             {
               "url": "https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=2310752",
-              "nom": "EMPD accordant au Conseil d'État un crédit d'investissement..."
+              "nom": "EMPD accordant au Conseil d'État un crédit d'investissement...",
+              "alias": "20250618_2310752.pdf"
             }
           ]
         },
@@ -69,6 +70,7 @@ Le script génère un fichier unique `output/storage.json` avec la structure sui
 
 - `url` : URL du fichier
 - `nom` : Nom ou description du fichier
+- `alias` : Nom du fichier dans le dossier de sortie (format : YYYYMMDD_ID.pdf)
 
 ## Utilisation
 
@@ -113,10 +115,14 @@ python run.py --help
 
 Le script affiche :
 
-- Le nombre total de séances dans la base
-- Le nombre de nouvelles séances trouvées
-- Le chemin du fichier JSON
-- Un résumé des nouvelles séances extraites
+- Le nombre total de séances
+- Le nombre de nouvelles séances découvertes
+- Le nombre de séances existantes
+- Le nombre de séances en erreur
+- Le nombre de fichiers téléchargés
+- Le nombre de fichiers déjà présents
+- Le nombre de fichiers en erreur
+- Le nombre de fichiers ignorés
 
 Exemple :
 
