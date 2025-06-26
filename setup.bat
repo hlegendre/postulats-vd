@@ -1,9 +1,9 @@
 @echo off
-REM Script de configuration du Téléchargeur de séances du Conseil d'État VD pour Windows
+REM Script de configuration du Téléchargeur de postulats du Conseil d'État VD pour Windows
 REM Ce script aide à configurer le projet avec uv
 
-echo Téléchargeur de séances du Conseil d'État VD - Script de configuration
-echo =====================================================================
+echo Téléchargeur de postulats du Conseil d'État VD - Script de configuration
+echo ========================================================================
 
 REM Check if Python is installed
 python --version >nul 2>&1
@@ -41,18 +41,20 @@ if errorlevel 1 (
     exit /b 1
 )
 
+REM Setup pre-commit hooks
+echo 🔧 Configuration des hooks pre-commit...
+uv run pre-commit install
+if errorlevel 1 (
+    echo ❌ Échec de la configuration des hooks pre-commit.
+    pause
+    exit /b 1
+)
+
 echo.
 echo 🎉 Configuration terminée avec succès !
 echo.
-echo Prochaines étapes :
-echo 1. Activer l'environnement virtuel :
-echo    .venv\Scripts\activate
-echo.
-echo 2. Tester l'application :
-echo    python test_downloader.py
-echo.
-echo 3. Lancer l'application principale :
-echo    python downloader.py
+echo Pour lancer l'application :
+echo    python run.py
 echo.
 echo Pour plus d'informations, consultez README.md
 pause 
