@@ -20,15 +20,18 @@ from ..utils.logging import LoggingUtils, Logger
 class SeanceFichier(TypedDict):
     url: str
     nom: str
+    alias: str
 
     @staticmethod
     def check_type(data: Any) -> bool:
         return (
             isinstance(data, dict)
             and "url" in data
-            and "nom" in data
             and isinstance(data["url"], str)
+            and "nom" in data
             and isinstance(data["nom"], str)
+            and "alias" in data
+            and isinstance(data["alias"], str)
         )
 
 

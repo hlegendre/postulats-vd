@@ -12,6 +12,7 @@ from .settings import (
     REQUEST_TIMEOUT,
     USER_AGENT,
     PAGE_DELAY,
+    FILE_PATTERNS,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "REQUEST_TIMEOUT",
     "USER_AGENT",
     "PAGE_DELAY",
+    "FILE_PATTERNS",
 ]

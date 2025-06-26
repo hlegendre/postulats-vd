@@ -46,7 +46,7 @@ class SessionLister:
         self.logger = LoggingUtils.setup_simple_logger("ExtracteurSéances")
         self.storage = storage
 
-        self.logger.info(f"Découvreur de séances initialisé avec le fichier de sortie : {self.storage.get_file_path()}")
+        self.logger.info(f"Découvreur de séances initialisé avec la base de données : {self.storage.get_file_path()}")
         self.logger.info(f"Séances existantes chargées : {self.storage.seances_count()}")
 
     def _extract_seances(self, html_content: str, base_url: str, current_date: str) -> tuple[int, int, bool]:

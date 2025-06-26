@@ -4,7 +4,7 @@ from src.postulats_vd.config import (
     OUTPUT_FOLDER,
     STOP_DATE,
 )
-from src.postulats_vd.core import SessionLister, SessionExtractor, Storage
+from src.postulats_vd.core import SessionLister, SessionExtractor, Storage, FileDownloader
 
 
 def parse_arguments():
@@ -59,13 +59,22 @@ def main():
         print(f"❌ Échec de la découverte : {result.get('error', 'Erreur inconnue')}")
         exit(1)
 
-    # Récupération des séances
-    print("=== Récupération des Séances du Conseil d'État VD ===")
+    # Extraction des séances
+    print("=== Extraction des Séances du Conseil d'État VD ===")
     sessionExtractor = SessionExtractor(storage=storage)
     result = sessionExtractor.extract_all_seances()
     status = "✅ OK" if result["success"] else "❌ KO"
     print(
         f"{status} : nouvelles = {result['nb_extracted']} / ignorées = {result['nb_ignored']} / en erreur = {result['nb_error']}"
+    )
+
+    # Téléchargement des fichiers
+    print("=== Téléchargement des Fichiers des Séances du Conseil d'État VD ===")
+    fileDownloader = FileDownloader(storage=storage)
+    result = fileDownloader.download_all_files()
+    status = "✅ OK" if result["nb_error"] == 0 else "❌ KO"
+    print(
+        f"{status} : téléchargés = {result['nb_downloaded']} / ignorés = {result['nb_ignored']} / existants = {result['nb_existing']} / en erreur = {result['nb_error']}"
     )
 
 

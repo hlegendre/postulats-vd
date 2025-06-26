@@ -9,7 +9,6 @@ Auteur: Hugues Le Gendre
 Date: 2024
 """
 
-
 from typing import List, TypedDict
 
 from bs4 import BeautifulSoup
@@ -20,7 +19,7 @@ from ..utils.logging import LoggingUtils
 from ..utils.web_fetcher import WebFetcher
 
 
-def _parse_partie(soup: BeautifulSoup) -> SeancePartie:
+def _parse_discussion(soup: BeautifulSoup, seance: Seance, id_discussion: int) -> SeancePartie:
     h2 = soup.select_one("h2.heading")
     if not h2:
         print("error: no h2 found")
@@ -29,14 +28,23 @@ def _parse_partie(soup: BeautifulSoup) -> SeancePartie:
     return {
         "titre": h2.get_text(strip=True),
         "fichiers": [
-            {"url": file.get("href"), "nom": file.get_text(strip=True)}
-            for file in soup.find_all("a", href=True)
+            {
+                "url": file.get("href"),
+                "nom": file.get_text(strip=True),
+                "alias": seance["date"].replace("-", "")
+                + "_"
+                + str(id_discussion + 1)
+                + "_"
+                + str(id_file + 1)
+                + ".pdf",
+            }
+            for id_file, file in enumerate(soup.find_all("a", href=True))
             if file.get("href").startswith("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=")
         ],
     }
 
 
-def _parse_seance(soup: BeautifulSoup) -> List[SeancePartie]:
+def _parse_seance(soup: BeautifulSoup, seance: Seance) -> List[SeancePartie]:
     """
     Extrait toutes les discussions d'une séance
 
@@ -48,7 +56,7 @@ def _parse_seance(soup: BeautifulSoup) -> List[SeancePartie]:
     """
     parts = soup.select("#main .col-md-12.pl-0.pr-0")
 
-    return [_parse_partie(part) for part in parts]
+    return [_parse_discussion(part, seance, id_discussion) for id_discussion, part in enumerate(parts)]
 
 
 class SessionExtractorResult(TypedDict):
@@ -91,7 +99,7 @@ class SessionExtractor:
 
         try:
             soup = BeautifulSoup(html_content, "html.parser")
-            seance["discussions"] = _parse_seance(soup)
+            seance["discussions"] = _parse_seance(soup, seance)
 
             self.storage.seance_upsert(seance)
             self.logger.info(f"Séance \"{seance["date"]}\" extraite : {len(seance['discussions'])} discussions")
