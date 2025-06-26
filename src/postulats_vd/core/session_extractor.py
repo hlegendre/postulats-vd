@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 
 from .storage import Storage, Seance, SeancePartie
 from ..utils.logging import LoggingUtils
-from ..utils.html_fetcher import HtmlFetcher
+from ..utils.web_fetcher import WebFetcher
 
 
 def _parse_partie(soup: BeautifulSoup) -> SeancePartie:
@@ -69,7 +69,6 @@ class SessionExtractor:
         """
         self.logger = LoggingUtils.setup_simple_logger("ExtracteurSession")
         self.storage = storage
-        self.html_fetcher = HtmlFetcher()
 
         self.logger.info(f"Extracteur de contenu initialisé avec le fichier de sortie : {self.storage.get_file_path()}")
         self.logger.info(f"Séances existantes chargées : {self.storage.seances_count()}")
@@ -85,7 +84,7 @@ class SessionExtractor:
         Returns:
             True si l'extraction a réussi, False sinon
         """
-        html_content = self.html_fetcher.string(seance["url"])
+        html_content = WebFetcher().html_string(seance["url"])
         if not html_content:
             self.logger.error(f"Impossible de récupérer le contenu de la séance : {seance['url']}")
             return False

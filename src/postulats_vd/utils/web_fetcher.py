@@ -14,37 +14,37 @@ from ..config import REQUEST_TIMEOUT, USER_AGENT, PAGE_DELAY
 from .logging import LoggingUtils
 
 
-class HtmlFetcher:
+class WebFetcher:
     """
-    Utility class for fetching HTML content from web pages.
-    Singleton pattern implementation with rate limiting.
+    Classe utilitaire pour récupérer du contenu web.
+    Implémentation du pattern singleton avec limitation de débit.
     """
 
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(HtmlFetcher, cls).__new__(cls)
+            cls._instance = super(WebFetcher, cls).__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
     def __init__(self):
         """
-        Initialize the HTML fetcher with a session and headers.
-        Only initializes once due to singleton pattern.
+        Initialise le fetcher web avec une session et des headers.
+        Initialisation unique due au pattern singleton.
         """
         if self._initialized:
             return
 
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": USER_AGENT})
-        self.logger = LoggingUtils.setup_simple_logger("HtmlFetcher")
+        self.logger = LoggingUtils.setup_simple_logger("WebFetcher")
         self._last_request_time = 0  # Timestamp of the last request
         self._initialized = True
 
     def _apply_rate_limit(self):
         """
-        Apply rate limiting by waiting if necessary before making a request.
+        Applique la limitation de débit en attendant si nécessaire avant de faire une requête.
         """
         if PAGE_DELAY <= 0:
             return
@@ -58,15 +58,15 @@ class HtmlFetcher:
 
         self._last_request_time = time.time()
 
-    def string(self, url: str) -> Optional[str]:
+    def html_string(self, url: str) -> Optional[str]:
         """
-        Fetch HTML content as a string from a given URL.
+        Récupère le contenu HTML d'une URL et le retourne sous forme de chaîne de caractères.
 
         Args:
-            url (str): URL to fetch
+            url (str): URL à récupérer
 
         Returns:
-            str: HTML content as string, or None if failed
+            str: Contenu HTML, ou None en cas d'échec
         """
         # Apply rate limiting before making the request
         self._apply_rate_limit()
@@ -84,17 +84,34 @@ class HtmlFetcher:
             self.logger.error(f"Erreur lors de la récupération de {url} : {e}")
             return None
 
-    def soup(self, url: str) -> Optional[BeautifulSoup]:
+    def html_soup(self, url: str) -> Optional[BeautifulSoup]:
         """
-        Fetch HTML content and return it as a BeautifulSoup object.
+        Récupère le contenu HTML d'une URL et le retourne sous forme d'objet BeautifulSoup.
 
         Args:
-            url (str): URL to fetch
+            url (str): URL à récupérer
 
         Returns:
-            BeautifulSoup: Parsed HTML content, or None if failed
+            BeautifulSoup: Contenu HTML parsé, ou None en cas d'échec
         """
-        html_content = self.string(url)
+        html_content = self.html_string(url)
         if html_content:
             return BeautifulSoup(html_content, "html.parser")
         return None
+
+    def download_file(self, url: str, filepath: str) -> bool:
+        """
+        Télécharge un fichier depuis une URL et le sauvegarde dans un fichier.
+        """
+        self._apply_rate_limit()
+
+        try:
+            response = self.session.get(url, timeout=REQUEST_TIMEOUT)
+            response.raise_for_status()
+            with open(filepath, "wb") as f:
+                f.write(response.content)
+        except requests.RequestException as e:
+            self.logger.error(f"Erreur lors du téléchargement de {url} : {e}")
+            return False
+
+        return True

@@ -21,7 +21,7 @@ from ..config import (
 )
 from .storage import Storage, Seance
 from ..utils.logging import LoggingUtils
-from ..utils.html_fetcher import HtmlFetcher
+from ..utils.web_fetcher import WebFetcher
 from ..utils.date_parser import DateParser
 from ..utils.url import extract_base_url
 
@@ -178,7 +178,7 @@ class SessionLister:
             self.logger.debug(f"Traitement de la page {len(visited_urls)} : {current_url}")
 
             # Récupérer le contenu de la page
-            html_content = HtmlFetcher().string(current_url)
+            html_content = WebFetcher().html_string(current_url)
             if not html_content:
                 self.logger.error(f"Échec de la récupération du contenu de la page {current_url}")
                 break

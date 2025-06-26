@@ -4,14 +4,14 @@ Test for HtmlFetcher singleton pattern and rate limiting
 """
 
 import time
-from src.postulats_vd.utils.html_fetcher import HtmlFetcher
+from postulats_vd.utils.web_fetcher import WebFetcher
 
 
 def test_html_fetcher_singleton():
     """Test that HtmlFetcher follows singleton pattern"""
     # Create two instances
-    fetcher1 = HtmlFetcher()
-    fetcher2 = HtmlFetcher()
+    fetcher1 = WebFetcher()
+    fetcher2 = WebFetcher()
 
     # They should be the same object
     assert fetcher1 is fetcher2
@@ -25,7 +25,7 @@ def test_html_fetcher_singleton():
 
 def test_html_fetcher_initialization():
     """Test that HtmlFetcher initializes correctly"""
-    fetcher = HtmlFetcher()
+    fetcher = WebFetcher()
 
     # Check that session exists and has user agent
     assert hasattr(fetcher, "session")
@@ -44,7 +44,7 @@ def test_html_fetcher_initialization():
 
 def test_rate_limiting_timestamp():
     """Test that rate limiting timestamp is updated after requests"""
-    fetcher = HtmlFetcher()
+    fetcher = WebFetcher()
 
     # Reset the timestamp to simulate a fresh start
     fetcher._last_request_time = 0

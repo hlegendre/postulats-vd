@@ -32,7 +32,7 @@ def test_session_extractor_initialization():
 
         # Vérifier que l'extracteur a été initialisé correctement
         assert extractor.storage is not None, "Le storage n'a pas été initialisé"
-        assert extractor.html_fetcher is not None, "Le html_fetcher n'a pas été initialisé"
+        assert extractor.web_fetcher is not None, "Le html_fetcher n'a pas été initialisé"
         assert extractor.logger is not None, "Le logger n'a pas été initialisé"
 
         print("   ✅ Extracteur initialisé correctement")
@@ -173,7 +173,7 @@ def test_extract_seance_success():
         </div>
         """
 
-        with patch.object(extractor.html_fetcher, "string", return_value=test_html):
+        with patch.object(extractor.web_fetcher, "string", return_value=test_html):
             success = extractor.extract_seance(test_seance)
 
         # Vérifier que l'extraction a réussi

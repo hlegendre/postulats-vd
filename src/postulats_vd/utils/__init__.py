@@ -5,7 +5,7 @@ This module contains utility functions and helpers used throughout the package.
 """
 
 from .logging import LoggingUtils
-from .html_fetcher import HtmlFetcher
+from .web_fetcher import WebFetcher
 from .date_parser import DateParser
 
-__all__ = ["LoggingUtils", "HtmlFetcher", "DateParser"]
+__all__ = ["LoggingUtils", "WebFetcher", "DateParser"]
