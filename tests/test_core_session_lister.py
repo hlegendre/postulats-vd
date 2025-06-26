@@ -99,9 +99,7 @@ def test_single_file_logging() -> None:
         result3 = downloader3.list()
 
         assert result3["success"], f"Échec du troisième lancement : {result3.get('error', 'Erreur inconnue')}"
-        assert result3["stored_seances"] == result1["stored_seances"], (
-            "Le nombre de séances stockées doit être le même"
-        )
+        assert result3["stored_seances"] == result1["stored_seances"], "Le nombre de séances stockées doit être le même"
         assert result3["new_seances_count"] == 1, "Une nouvelle séance doit être ajoutée"
 
         print(f"   ✅ Succès : {result3['stored_seances']} séances totales, {result3['new_seances_count']} nouvelles")

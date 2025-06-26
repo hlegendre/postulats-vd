@@ -41,7 +41,7 @@ def test_logging_utils() -> None:
 
 
 if __name__ == "__main__":
-    print("🧪 Démarrage des tests de LoggingUtils...")  
+    print("🧪 Démarrage des tests de LoggingUtils...")
     print()
 
     try:

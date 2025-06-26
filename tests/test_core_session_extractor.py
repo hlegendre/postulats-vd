@@ -209,10 +209,10 @@ def test_extract_seance_success() -> None:
         </div>
         """
 
-        with patch('src.postulats_vd.core.session_extractor.WebFetcher') as mock_web_fetcher:
+        with patch("src.postulats_vd.core.session_extractor.WebFetcher") as mock_web_fetcher:
             mock_instance = mock_web_fetcher.return_value
             mock_instance.html_string.return_value = test_html
-            
+
             success = extractor.extract_seance(test_seance)
 
         # Vérifier que l'extraction a réussi

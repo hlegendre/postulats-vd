@@ -60,6 +60,7 @@ def test_rate_limiting_timestamp() -> None:
     assert fetcher._last_request_time > 0
     assert fetcher._last_request_time == initial_timestamp
 
+
 if __name__ == "__main__":
     print("🧪 Démarrage des tests de WebFetcher...")
     print()

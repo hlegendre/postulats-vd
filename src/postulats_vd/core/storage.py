@@ -18,6 +18,8 @@ from ..config import OUTPUT_FOLDER, STORAGE_FILENAME
 from ..utils.logging import Logger, LoggingUtils
 
 SeanceFichier = TypedDict("SeanceFichier", {"url": str, "nom": str, "alias": str})
+
+
 def SeanceFichier_check_type(data: Any) -> bool:
     return (
         isinstance(data, dict)
@@ -29,7 +31,10 @@ def SeanceFichier_check_type(data: Any) -> bool:
         and isinstance(data["alias"], str)
     )
 
+
 SeancePartie = TypedDict("SeancePartie", {"titre": str, "fichiers": list[SeanceFichier]})
+
+
 def SeancePartie_check_type(data: Any) -> bool:
     return (
         isinstance(data, dict)
@@ -40,7 +45,20 @@ def SeancePartie_check_type(data: Any) -> bool:
         and all(SeanceFichier_check_type(fichier) for fichier in data["fichiers"])
     )
 
-Seance = TypedDict("Seance", {"url": str, "date": str, "date_decouverte": str, "date_originale": str, "titre": str, "discussions": list[SeancePartie]})
+
+Seance = TypedDict(
+    "Seance",
+    {
+        "url": str,
+        "date": str,
+        "date_decouverte": str,
+        "date_originale": str,
+        "titre": str,
+        "discussions": list[SeancePartie],
+    },
+)
+
+
 def Seance_check_type(data: Any) -> bool:
     return (
         isinstance(data, dict)
@@ -59,7 +77,12 @@ def Seance_check_type(data: Any) -> bool:
         and all(SeancePartie_check_type(partie) for partie in data["discussions"])
     )
 
-StorageMetadonnees = TypedDict("StorageMetadonnees", {"url_source": str, "derniere_mise_a_jour": str, "total_seances": int})
+
+StorageMetadonnees = TypedDict(
+    "StorageMetadonnees", {"url_source": str, "derniere_mise_a_jour": str, "total_seances": int}
+)
+
+
 def StorageMetadonnees_check_type(data: Any) -> bool:
     return (
         isinstance(data, dict)
@@ -71,7 +94,10 @@ def StorageMetadonnees_check_type(data: Any) -> bool:
         and isinstance(data["total_seances"], int)
     )
 
+
 StorageData = TypedDict("StorageData", {"metadonnees": StorageMetadonnees, "seances": list[Seance]})
+
+
 def StorageData_check_type(data: Any) -> bool:
     return (
         isinstance(data, dict)
@@ -81,6 +107,7 @@ def StorageData_check_type(data: Any) -> bool:
         and isinstance(data["seances"], list)
         and all(Seance_check_type(seance) for seance in data["seances"])
     )
+
 
 def StorageData_load_from_json(data: Any) -> Optional["StorageData"]:
     storage_data = json.loads(data)
@@ -145,7 +172,7 @@ class Storage:
         try:
             with open(self.storage_file, "r", encoding="utf-8") as f:
                 data = StorageData_load_from_json(f.read())
-                return {seance["date"]: seance for seance in data["seances"] } if data is not None else {}
+                return {seance["date"]: seance for seance in data["seances"]} if data is not None else {}
 
         except (ValueError, json.JSONDecodeError, FileNotFoundError) as e:
             self.logger.warning(f"Erreur lors du chargement de la base de données : {e}")

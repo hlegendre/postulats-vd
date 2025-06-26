@@ -26,7 +26,11 @@ from ..utils.url import extract_base_url
 from ..utils.web_fetcher import WebFetcher
 from .storage import Seance, Storage
 
-SessionListerResult = TypedDict("SessionListerResult", {"success": bool, "pages_processed": int, "new_seances_count": int, "stored_seances": int, "stop_reached": bool})
+SessionListerResult = TypedDict(
+    "SessionListerResult",
+    {"success": bool, "pages_processed": int, "new_seances_count": int, "stored_seances": int, "stop_reached": bool},
+)
+
 
 class SessionLister:
     def __init__(self, storage: Storage):

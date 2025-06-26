@@ -18,7 +18,10 @@ from ..utils.logging import LoggingUtils
 from ..utils.web_fetcher import WebFetcher
 from .storage import Seance, SeanceFichier, Storage
 
-FileDownloaderResult = TypedDict("FileDownloaderResult", {"nb_downloaded": int, "nb_error": int, "nb_ignored": int, "nb_existing": int})
+FileDownloaderResult = TypedDict(
+    "FileDownloaderResult", {"nb_downloaded": int, "nb_error": int, "nb_ignored": int, "nb_existing": int}
+)
+
 
 class FileDownloadStatus(Enum):
     TO_DOWNLOAD = "TO_DOWNLOAD"

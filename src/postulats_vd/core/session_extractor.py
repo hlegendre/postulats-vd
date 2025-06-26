@@ -18,7 +18,7 @@ from ..utils.web_fetcher import WebFetcher
 from .storage import Seance, SeancePartie, Storage
 
 
-def _parse_discussion(soup: Tag, seance: Seance) -> SeancePartie|None:
+def _parse_discussion(soup: Tag, seance: Seance) -> SeancePartie | None:
     h2 = soup.select_one("h2.heading")
     if not h2:
         print("error: no h2 found")
@@ -32,11 +32,16 @@ def _parse_discussion(soup: Tag, seance: Seance) -> SeancePartie|None:
                 "nom": file.get_text(strip=True),
                 "alias": seance["date"].replace("-", "")
                 + "_"
-                + (str(file.get("href")).replace("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=", "") if isinstance(file, Tag) else "")
+                + (
+                    str(file.get("href")).replace("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=", "")
+                    if isinstance(file, Tag)
+                    else ""
+                )
                 + ".pdf",
             }
             for file in soup.find_all("a", href=True)
-            if isinstance(file, Tag) and str(file.get("href")).startswith("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=")
+            if isinstance(file, Tag)
+            and str(file.get("href")).startswith("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=")
         ],
     }
 
@@ -56,7 +61,10 @@ def _parse_seance(soup: BeautifulSoup, seance: Seance) -> List[SeancePartie]:
     return [part for part in [_parse_discussion(part, seance) for part in parts] if part is not None]
 
 
-SessionExtractorResult = TypedDict("SessionExtractorResult", {"success": bool, "nb_extracted": int, "nb_error": int, "nb_already": int})
+SessionExtractorResult = TypedDict(
+    "SessionExtractorResult", {"success": bool, "nb_extracted": int, "nb_error": int, "nb_already": int}
+)
+
 
 class SessionExtractor:
     def __init__(self, storage: Storage):
