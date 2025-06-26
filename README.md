@@ -12,6 +12,7 @@ Ce script permet d'extraire automatiquement les informations détaillées des s�
 - **Pagination automatique** : Parcourt automatiquement toutes les pages disponibles
 - **Arrêt conditionnel** : Possibilité de s'arrêter à une date limite configurée
 - **Extraction des discussions et fichiers** : Pour chaque séance, toutes les discussions et fichiers associés sont extraits
+- **Filtrage intelligent des fichiers** : Seuls les fichiers correspondant aux patterns configurés sont téléchargés
 
 ## Structure du fichier JSON
 
@@ -109,31 +110,36 @@ python run.py --help
 - `-v, --verbose` : Niveau de verbosité
   - `-v` : Mode info (affiche les informations de base)
   - `-vv` : Mode debug (affiche tous les détails)
-  - Par défaut : Mode silencieux
+  - Par défaut : Mode silencieux (affiche uniquement les résultats finaux)
+
+### Niveaux de verbosité
+
+- **Mode silencieux** (par défaut) : Affiche uniquement les résultats finaux de chaque étape
+- **Mode info** (`-v`) : Affiche les informations de base comme le dossier de sortie et la date limite d'arrêt
+- **Mode debug** (`-vv`) : Affiche tous les détails, y compris les URLs traitées, les fichiers téléchargés, etc.
 
 ### Sortie
 
-Le script affiche :
+Le script affiche trois sections principales :
 
-- Le nombre total de séances
-- Le nombre de nouvelles séances découvertes
-- Le nombre de séances existantes
-- Le nombre de séances en erreur
-- Le nombre de fichiers téléchargés
-- Le nombre de fichiers déjà présents
-- Le nombre de fichiers en erreur
-- Le nombre de fichiers ignorés
+1. **Découverte des séances** : Nombre de nouvelles séances trouvées, total de séances stockées, et pages traitées
+2. **Extraction des séances** : Nombre de nouvelles séances extraites, séances existantes, et séances en erreur
+3. **Téléchargement des fichiers** : Nombre de fichiers téléchargés, ignorés, existants, et en erreur
 
-Exemple :
+Exemple de sortie :
 
 ```text
 === Découverte des Séances du Conseil d'État VD ===
 ✅ OK : nouvelles = 2 / totales = 10 (pages = 1)
-=== Récupération des Séances du Conseil d'État VD ===
-✅ OK : nouvelles = 2 / ignorées = 8 / en erreur = 0
+
+=== Extraction des Séances du Conseil d'État VD ===
+✅ OK : nouvelles = 2 / existantes = 8 / en erreur = 0
+
+=== Téléchargement des Fichiers des Séances du Conseil d'État VD ===
+✅ OK : téléchargés = 5 / ignorés = 3 / existants = 2 / en erreur = 0
 ```
 
-Le fichier de sortie est : `output/storage.json`
+Le fichier de base de données est : `output/storage.json`
 
 ## Qualité du Code
 
@@ -141,8 +147,7 @@ Le fichier de sortie est : `output/storage.json`
 
 Le projet utilise plusieurs outils pour maintenir la qualité du code :
 
-- **Black** : Formateur de code automatique
-- **Flake8** : Linter pour détecter les erreurs de style et de logique
+- **Ruff** : Formateur + linter de code automatique
 - **Pre-commit hooks** : Vérifications automatiques avant chaque commit
 
 ### Installation des hooks pre-commit
@@ -161,22 +166,16 @@ chmod +x .git/hooks/pre-commit
 
 ### Utilisation des outils de qualité
 
-**Formater le code avec Black :**
+**Vérifier le formatage / linter le code avec Ruff :**
 
 ```bash
-uv run black .
+uv run ruff check
 ```
 
-**Vérifier le formatage sans modification :**
+**Exécuter le formatage / linter avec modification :**
 
 ```bash
-uv run black --check .
-```
-
-**Linter le code avec Flake8 :**
-
-```bash
-uv run flake8 .
+uv run ruff format
 ```
 
 **Tester manuellement le hook pre-commit :**
@@ -244,12 +243,37 @@ Les tests vérifient :
 
 ## Configuration
 
-Le script utilise le fichier `settings.py` pour sa configuration :
+Le script utilise le fichier `src/postulats_vd/config/settings.py` pour sa configuration :
 
-- `OUTPUT_FOLDER` : Dossier de sortie pour les fichiers JSON (par défaut `output`)
-- `MAX_SESSIONS` : Nombre maximum de pages à parcourir
-- `STOP_DATE` : Date limite d'arrêt (format YYYY-MM-DD)
-- `REQUEST_TIMEOUT` : Timeout des requêtes HTTP
-- `PAGE_DELAY` : Délai entre les requêtes de pages
+### Paramètres de base
 
-**Note** : Le niveau de verbosité est maintenant configuré via les arguments de ligne de commande (`-v`, `-vv`) et non plus dans le fichier de configuration.
+- `OUTPUT_FOLDER` : Dossier de sortie pour les fichiers JSON et PDF (par défaut `output`)
+- `STORAGE_FILENAME` : Nom du fichier JSON de stockage (par défaut `storage.json`)
+- `MAX_SESSIONS` : Nombre maximum de pages à parcourir (par défaut `1000`)
+
+### Paramètres de filtrage
+
+- `STOP_DATE` : Date limite d'arrêt (format YYYY-MM-DD, par défaut `"2024-01-01"`)
+- `FILE_PATTERNS` : Patterns pour filtrer les fichiers à télécharger (par défaut `["_POS_"]`)
+
+### Paramètres de requête HTTP
+
+- `REQUEST_TIMEOUT` : Timeout des requêtes HTTP en secondes (par défaut `30`)
+- `USER_AGENT` : User agent pour les requêtes HTTP
+- `PAGE_DELAY` : Délai en secondes entre les requêtes de pages (par défaut `1`)
+
+**Note** : Le niveau de verbosité est configuré via les arguments de ligne de commande (`-v`, `-vv`) et non dans le fichier de configuration.
+
+## Filtrage des fichiers
+
+Le script utilise le paramètre `FILE_PATTERNS` pour déterminer quels fichiers télécharger. Par défaut, seuls les fichiers contenant `_POS_` dans leur nom sont téléchargés.
+
+### Exemples de filtrage
+
+- **Pattern par défaut** : `["_POS_"]` - Télécharge uniquement les fichiers contenant "_POS_" dans leur nom
+- **Tous les fichiers** : `[]` - Télécharge tous les fichiers disponibles
+- **Patterns multiples** : `["_POS_", "_EMP_"]` - Télécharge les fichiers contenant "_POS_" ou "_EMP_"
+
+### Fichiers ignorés
+
+Les fichiers qui ne correspondent à aucun pattern sont marqués comme "ignorés" dans les statistiques de téléchargement.

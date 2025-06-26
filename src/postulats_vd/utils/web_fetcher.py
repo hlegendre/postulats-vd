@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-HTML Fetcher Utility
+Utilitaire pour récupérer du contenu web.
 
-This module provides utility functions for fetching HTML content from web pages.
+Ce module fournit des fonctions utilitaires pour récupérer du contenu web.
 """
 
 import time
@@ -103,6 +103,13 @@ class WebFetcher:
     def download_file(self, url: str, filepath: str) -> bool:
         """
         Télécharge un fichier depuis une URL et le sauvegarde dans un fichier.
+
+        Args:
+            url (str): URL du fichier à télécharger
+            filepath (str): Chemin du fichier de destination
+
+        Returns:
+            bool: True si le téléchargement a réussi, False sinon
         """
         self._apply_rate_limit()
 

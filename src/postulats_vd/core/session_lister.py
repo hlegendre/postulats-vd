@@ -144,9 +144,8 @@ class SessionLister:
         """
         Méthode principale pour extraire les séances du Conseil d'État avec pagination, mais sans détails.
 
-        Args:
         Returns:
-            dict: Résumé de l'extraction
+            SessionListerResult: Résumé de l'extraction
         """
         current_date = datetime.now().isoformat()
         self.logger.debug(f"Date de découverte pour cette session : {current_date}")

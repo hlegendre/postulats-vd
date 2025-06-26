@@ -61,11 +61,11 @@ SessionExtractorResult = TypedDict("SessionExtractorResult", {"success": bool, "
 class SessionExtractor:
     def __init__(self, storage: Storage):
         """
-        Initialize the session extractor.
-        Bespoke to VD.ch Council of State session pages.
+        Initialise l'extracteur de séances.
+        Spécifique aux pages de séances du Conseil d'État du canton de Vaud.
 
         Args:
-            output_folder: Output folder path
+            storage: Stockage des séances
         """
         self.logger = LoggingUtils.setup_simple_logger("ExtracteurSession")
         self.storage = storage
