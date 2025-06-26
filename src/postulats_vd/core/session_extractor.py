@@ -11,14 +11,14 @@ Date: 2024
 
 from typing import List, TypedDict
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from ..utils.logging import LoggingUtils
 from ..utils.web_fetcher import WebFetcher
 from .storage import Seance, SeancePartie, Storage
 
 
-def _parse_discussion(soup: BeautifulSoup, seance: Seance) -> SeancePartie:
+def _parse_discussion(soup: Tag, seance: Seance) -> SeancePartie|None:
     h2 = soup.select_one("h2.heading")
     if not h2:
         print("error: no h2 found")
@@ -28,15 +28,15 @@ def _parse_discussion(soup: BeautifulSoup, seance: Seance) -> SeancePartie:
         "titre": h2.get_text(strip=True),
         "fichiers": [
             {
-                "url": file.get("href"),
+                "url": str(file.get("href")) if isinstance(file, Tag) else "",
                 "nom": file.get_text(strip=True),
                 "alias": seance["date"].replace("-", "")
                 + "_"
-                + file.get("href").replace("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=", "")
+                + (str(file.get("href")).replace("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=", "") if isinstance(file, Tag) else "")
                 + ".pdf",
             }
             for file in soup.find_all("a", href=True)
-            if file.get("href").startswith("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=")
+            if isinstance(file, Tag) and str(file.get("href")).startswith("https://sieldocs.vd.ch/ecm/app18/service/siel/getContent?ID=")
         ],
     }
 
@@ -53,15 +53,10 @@ def _parse_seance(soup: BeautifulSoup, seance: Seance) -> List[SeancePartie]:
     """
     parts = soup.select("#main .col-md-12.pl-0.pr-0")
 
-    return [_parse_discussion(part, seance) for part in parts]
+    return [part for part in [_parse_discussion(part, seance) for part in parts] if part is not None]
 
 
-class SessionExtractorResult(TypedDict):
-    success: bool
-    nb_extracted: int
-    nb_error: int
-    nb_ignored: int
-
+SessionExtractorResult = TypedDict("SessionExtractorResult", {"success": bool, "nb_extracted": int, "nb_error": int, "nb_already": int})
 
 class SessionExtractor:
     def __init__(self, storage: Storage):
@@ -130,5 +125,5 @@ class SessionExtractor:
             "success": nb_error == 0,
             "nb_extracted": nb_extracted,
             "nb_error": nb_error,
-            "nb_ignored": len(all_seances) - nb_extracted - nb_error,
+            "nb_already": len(all_seances) - nb_extracted - nb_error,
         }

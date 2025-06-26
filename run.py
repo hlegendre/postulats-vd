@@ -1,10 +1,11 @@
 import argparse
 import logging
+
 from src.postulats_vd.config import (
     OUTPUT_FOLDER,
     STOP_DATE,
 )
-from src.postulats_vd.core import SessionLister, SessionExtractor, Storage, FileDownloader
+from src.postulats_vd.core import FileDownloader, SessionExtractor, SessionLister, Storage
 
 
 def parse_arguments():
@@ -65,7 +66,7 @@ def main():
     result = sessionExtractor.extract_all_seances()
     status = "✅ OK" if result["success"] else "❌ KO"
     print(
-        f"{status} : nouvelles = {result['nb_extracted']} / ignorées = {result['nb_ignored']} / en erreur = {result['nb_error']}"
+        f"{status} : nouvelles = {result['nb_extracted']} / existantes = {result['nb_already']} / en erreur = {result['nb_error']}"
     )
 
     # Téléchargement des fichiers

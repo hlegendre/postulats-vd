@@ -11,10 +11,10 @@ Date: 2024
 
 import re
 from datetime import datetime
-from typing import TypedDict
+from typing import TypedDict, cast
 from urllib.parse import urljoin
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from ..config import (
     MAX_SESSIONS,
@@ -26,14 +26,7 @@ from ..utils.url import extract_base_url
 from ..utils.web_fetcher import WebFetcher
 from .storage import Seance, Storage
 
-
-class SessionListerResult(TypedDict):
-    success: bool
-    pages_processed: int
-    new_seances_count: int
-    stored_seances: int
-    stop_reached: bool
-
+SessionListerResult = TypedDict("SessionListerResult", {"success": bool, "pages_processed": int, "new_seances_count": int, "stored_seances": int, "stop_reached": bool})
 
 class SessionLister:
     def __init__(self, storage: Storage):
@@ -75,7 +68,7 @@ class SessionLister:
 
         for link in soup.find_all("a", href=True):
             link_text = link.get_text(strip=True)
-            href = link.get("href")
+            href = str(link.get("href")) if isinstance(link, Tag) else None
 
             if href and link_text:
                 match = seance_pattern.search(link_text)
@@ -133,13 +126,13 @@ class SessionLister:
             return None
 
         # Chercher les liens "Page suivante" avec la classe spécifique
-        next_links = pagination_nav.find_all("a", class_="vd-pagination__link")
+        next_links = cast(Tag, pagination_nav).find_all("a", class_="vd-pagination__link")
 
         for link in next_links:
             # Vérifier si c'est un lien "Page suivante"
             link_text = link.get_text(strip=True).lower()
             if "suivante" in link_text or "next" in link_text:
-                href = link.get("href")
+                href = str(link.get("href")) if isinstance(link, Tag) else None
                 if href:
                     full_url = urljoin(base_url, href)
                     self.logger.debug(f"Lien de pagination trouvé : {full_url}")
@@ -166,8 +159,8 @@ class SessionLister:
 
         new_seances_count = 0
         stop_reached = False
-        current_url = first_url
-        visited_urls = set()  # Pour éviter les boucles infinies
+        current_url: str | None = first_url
+        visited_urls: set[str] = set()  # Pour éviter les boucles infinies
 
         while current_url and len(visited_urls) < MAX_SESSIONS and not stop_reached:
             # Vérifier si l'URL a déjà été visitée
